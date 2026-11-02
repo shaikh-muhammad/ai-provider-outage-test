@@ -2,9 +2,18 @@ schema_version: 1
 status: PROPOSED
 frozen: false
 metadata:
-  approval: Owner review and merge to main are required before freezing. This proposal authorizes no official execution.
+  approval: Unapproved proposal. Complete activation_requirements AFTER explicit owner approval but BEFORE merge.
+    No official execution until the approved frozen files are merged to main.
+  activation_requirements:
+  - Both YAML documents must consistently state status=FROZEN and frozen=true with the owner-approved values.
+  - Tests must enforce the approved frozen state in both YAML documents.
+  - Record owner approval provenance and approved registration/source checksums.
+  - CI must succeed against the final exact PR head before merge.
+  - Never merge status=PROPOSED or frozen=false; merge the approved frozen files to main before any official run.
+  - Do not edit the frozen files after that merge.
   source_head: f1d3d386fabfce165edb85850b8accd7ae125151
-  brief: No Project 3 brief file found; decision rules follow the owner task specification.
+  brief: Owner-supplied authoritative Project 3 brief sections 7.4 and 8 require the S0 extra-attempt control and
+    five-second 95% recovery window; these supersede the earlier latency-primary and first-success proxies.
   proposed_source_sha256:
     src/outage_test/client.py: 18b5438073d8b9b226df15f38f1213b31936c37b4f3c2bd2448ab8259a24eb31
     src/outage_test/provider.py: c64545af9bf2c604f9324f8118fb8c6c23cea230ce1a058645c6c89f1586a9f9
@@ -161,8 +170,8 @@ invalid_handling:
     continue other slots and report all incomplete slots.
 decision:
   valid_runs: 3
-  aggregation: Median of the three valid per-run primary metrics; guardrails must pass in EVERY paired round. No
-    pooling or significance claim.
+  aggregation: Median of the three valid per-run primary metrics; guardrails must pass in EVERY paired round,
+    except the S0 latency guardrail compares medians of the three per-run p99 values. No pooling or significance claim.
   formulas:
     B: median(baseline)
     C: median(candidate)
@@ -175,6 +184,9 @@ decision:
   - NO MEASURABLE EFFECT
   - INCONCLUSIVE
   effective: I >= 0.20 and I > S and every guardrail passes; additionally apply the S3 C4 gate.
+  s0_control: A complete S0 control with zero C4 extras in every run and all guardrails passing is NO MEASURABLE
+    EFFECT, not EFFECTIVE merely for being healthy. Any control guardrail violation is HARMFUL; incomplete data
+    is INCONCLUSIVE, with demonstrated harm taking precedence.
   harmful: Any guardrail violation, or I <= -0.20 and -I > S. Guardrail harm takes precedence.
   no_measurable_effect: abs(I) < 0.20 or I <= S, provided no harmful guardrail violation.
   inconclusive: All other cases, absent/undefined required metrics, fewer than three valid paired runs, or failed
@@ -184,24 +196,39 @@ decision:
     candidate_positive: HARMFUL if candidate median exceeds raw baseline range; otherwise NO MEASURABLE EFFECT,
       unless a guardrail is violated
     ratios: I and S are null when B=0; compare raw nonnegative values; never divide by zero
-  missing_recovery: Finite baseline with no candidate recovery is a harmful guardrail failure; no recovery in both
-    arms is undefined and INCONCLUSIVE.
+  missing_recovery: Finite baseline with no candidate recovery is HARMFUL. Missing baseline with finite candidate,
+    or both missing, is INCONCLUSIVE unless another guardrail demonstrates harm. Never substitute finite times
+    or infinities for missing recovery. When both are finite, candidate <= baseline + 5 seconds passes.
+  recovery:
+    outage_end_seconds: 35
+    window_seconds: 5
+    observation_times_seconds: [40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60]
+    success_numerator: 19
+    success_denominator: 20
+    issued_time_field: launch_offset
+    window_boundaries: '[t-5,t)'
+    completion_cutoff: completion_offset <= t
   metric_definitions:
     success_fraction: SUCCESS final records / planned jobs; failures remain in denominator.
     extra_attempts: sum(max(0,number of attempts for each logical job - 1)); zero-attempt breaker rejections add
       zero.
     outside_outage_success_fraction: Success fraction among jobs with intended_offset outside [20,35).
-    recovery_seconds: Earliest completion_offset of a SUCCESS for a job with intended_offset >=35, minus 35 seconds;
-      absent if none.
+    recovery_seconds: At t=40,41,...,60 seconds, denominator D is ALL logical jobs actually issued (launch_offset)
+      in [t-5,t); numerator A is those jobs with SUCCESS final outcome and completion_offset <= t. The earliest
+      t with D>0 and 20*A>=19*D yields t-35 seconds. First window is [35,40); observations stop at issuance-horizon
+      60 seconds. Empty windows never qualify. No interpolation, rounding of issue times, future-completion
+      look-ahead or first-success shortcut. No qualifying window means null (no observed recovery).
     p99: Nearest-rank p99 over all logical latencies, including failures.
   metrics:
     S0:
-      primary: p99_logical_latency_seconds
-      definition: Nearest-rank p99 of completion_offset minus intended_offset for all planned logical records, including
-        failures.
+      primary: extra_attempts_per_logical_request
+      definition: For N planned logical jobs, let R_j be the count of authoritative reconciled provider-ledger
+        receipts for job j, including failed and deduplicated attempts. Metric = sum_j max(0,R_j-1)/N over ALL
+        planned jobs, including zero-receipt jobs. Never use max(0,total receipts-N)/N; missing reconciliation
+        is INVALID. C4 must equal zero in EACH of its three valid S0 runs.
       guardrails:
-      - candidate_physical_attempts <= baseline_physical_attempts
-      - candidate_p99 <= baseline_p99 + max(0.10 * baseline_p99, 0.020 seconds)
+      - C4_extra_attempts_per_logical_request == 0 in each of three valid runs
+      - median(candidate_p99) <= median(baseline_p99) + max(0.10 * median(baseline_p99), 0.020 seconds)
       - candidate_success_fraction >= baseline_success_fraction
     S1:
       primary: attempts_per_logical_request
@@ -247,6 +274,10 @@ implementation_dependencies:
     health flags; current validator requires frozen=false.
   - Compute outage-window attempts, outside-window success, recovery and other registered metrics from existing
     schedule/records/ledger; no registered metric API exists.
+  - Implement S0 per-job provider-receipt extras over all planned jobs, the all-three-zero control, and the S0
+    median-of-run-p99 guardrail; latency is not the S0 primary metric.
+  - Implement S2 recovery at the exact registered whole-second observation grid using actual issue times and
+    only completions observed by each window end; return null when no full window qualifies.
   P19:
   - Implement paired guardrails, zero-safe decision aggregation, stepwise four-class verdicts, incomplete-slot reporting
     and official report generation.
