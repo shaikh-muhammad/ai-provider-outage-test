@@ -1,0 +1,19 @@
+# Python environment
+.venv/
+
+# Python generated files
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Environment variables and secrets (this project needs none)
+.env*
+
+# Temporary files and package caches
+tmp/
+.pip-cache/
+.cache/
+
+# Local logs from long runs
+logs/
+*.log
