@@ -1,0 +1,4705 @@
+{
+  "assessment": "G6 READY",
+  "batch_log": {
+    "exit_code": 0,
+    "path": "logs/exploratory-g6-batch-73ca4535be254f1ea59fa047ed5f6c7d.log",
+    "sha256": "d5d03cff8302ac052465ac92980bb8dc4a68c03b9914e1b14944b55f0799a822",
+    "tee_exit_code": 0
+  },
+  "blockers": [],
+  "cleanup": {
+    "all_provider_lifecycles_reaped": true,
+    "no_batch_tmux_session": true,
+    "no_runner_or_provider_processes": true
+  },
+  "counts": {
+    "completed": 9,
+    "invalid": 0,
+    "not_run": 0,
+    "planned": 9,
+    "valid": 9
+  },
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "created_at_monotonic": 23006.607500508,
+  "created_at_utc": "2026-11-02T06:32:35.005214+00:00",
+  "environment": {
+    "cpu_count": 4,
+    "dependencies": {
+      "PyYAML": "6.0.3",
+      "aiohappyeyeballs": "2.7.1",
+      "aiohttp": "3.14.5",
+      "aiosignal": "1.4.0",
+      "attrs": "26.1.0",
+      "contourpy": "1.4.0",
+      "cycler": "0.12.1",
+      "fonttools": "4.68.0",
+      "frozenlist": "1.8.0",
+      "idna": "3.20",
+      "iniconfig": "2.3.1",
+      "kiwisolver": "1.5.1",
+      "matplotlib": "3.11.2",
+      "multidict": "7.2.1",
+      "numpy": "2.5.4",
+      "packaging": "26.3",
+      "pillow": "13.0.0",
+      "pluggy": "1.7.0",
+      "propcache": "0.5.4",
+      "pygments": "2.21.0",
+      "pyparsing": "3.3.3",
+      "pytest": "9.2.0",
+      "python-dateutil": "4.0.0",
+      "tzdata": "2026.6",
+      "yarl": "1.25.1"
+    },
+    "git_commit": "f1d3d386fabfce165edb85850b8accd7ae125151",
+    "kernel": "7.0.0-42-generic",
+    "os": "Linux",
+    "os_release": "Ubuntu 26.04.1 LTS",
+    "python": "3.14.4"
+  },
+  "exploratory": true,
+  "health_limits": {
+    "frozen": false,
+    "launch_lag_p99": 0.05,
+    "loop_lag_p99": 0.035,
+    "sample_interval": 0.01
+  },
+  "health_policy": {
+    "calibration_file": "exploratory-pilot-v2-calibration-940b5ecc11294745935d626b3405ce02.json",
+    "calibration_sha256": "c5e02ca40311bd65319f721969b44a5bb60ec0ab3ba75a5e2e69c50598f894ec",
+    "heldout_file": "exploratory-pilot-v2-heldout-89d2b85402874a5abc7069678cfc3ff3.json",
+    "heldout_p99_ms": 25.68971799701103,
+    "heldout_sha256": "7f8e89ceddcb308d94f37399279f92995b29c792bb8df3174cf67147c2e69cb6",
+    "maximum_idle_p99_ms": 26.2577789981151,
+    "name": "prospective-pilot-v2",
+    "predeclaration_sha256": "fcf9436735e4cc5d836d526d40438204a7c32b5473dac092414993f43f3bb54d",
+    "selected_loop_lag_ms": 35,
+    "training_p99_ms": [
+      26.2577789981151,
+      25.221183997928165,
+      25.588616001186892
+    ]
+  },
+  "integrity": {
+    "all_workloads_match_plan": true,
+    "no_official_results": true,
+    "no_unfinished_or_overflow_receipts": true,
+    "one_to_one_attempt_reconciliation": true,
+    "original_artifacts_unchanged": {
+      "exploratory-S0-C0-1-0480e9f4abc84937842b95d12da479d3.json": true,
+      "exploratory-S0-C0-1-10cb863235eb4a3fbe72b4f422598830.json": true,
+      "exploratory-S0-C0-1-9cce03d3509f47348dbb50835a725274.json": true,
+      "exploratory-pilot-v2-calibration-940b5ecc11294745935d626b3405ce02.json": true,
+      "exploratory-pilot-v2-heldout-89d2b85402874a5abc7069678cfc3ff3.json": true,
+      "exploratory-pilot-v2-rule-f8abeb01b79d48b58380e058c6d55220.json": true,
+      "manifest.json": true
+    },
+    "provider_counters_recomputed": true,
+    "tracked_files_unchanged": {
+      ".github/workflows/ci.yml": true,
+      ".gitignore": true,
+      "AGENTS.md": true,
+      "LICENSE": true,
+      "README.md": true,
+      "requirements-dev.lock": true,
+      "requirements-run.lock": true,
+      "results/pilot/exploratory-S0-C0-1-0480e9f4abc84937842b95d12da479d3.json": true,
+      "results/pilot/exploratory-S0-C0-1-10cb863235eb4a3fbe72b4f422598830.json": true,
+      "results/pilot/exploratory-S0-C0-1-9cce03d3509f47348dbb50835a725274.json": true,
+      "results/pilot/exploratory-pilot-v2-calibration-940b5ecc11294745935d626b3405ce02.json": true,
+      "results/pilot/exploratory-pilot-v2-heldout-89d2b85402874a5abc7069678cfc3ff3.json": true,
+      "results/pilot/exploratory-pilot-v2-rule-f8abeb01b79d48b58380e058c6d55220.json": true,
+      "results/pilot/manifest.json": true,
+      "scripts/env.sh": true,
+      "src/outage_test/__init__.py": true,
+      "src/outage_test/client.py": true,
+      "src/outage_test/faults.py": true,
+      "src/outage_test/harness.py": true,
+      "src/outage_test/provider.py": true,
+      "src/outage_test/runner.py": true,
+      "tests/test_client.py": true,
+      "tests/test_evidence.py": true,
+      "tests/test_harness.py": true,
+      "tests/test_protection.py": true,
+      "tests/test_provider.py": true,
+      "tests/test_runner.py": true,
+      "tests/test_security.py": true
+    },
+    "unique_result_filenames": true
+  },
+  "limitations": [
+    "Single paired pilots do not establish causal superiority or statistical significance.",
+    "S0 seeds differ, so service-time variation and environmental variation are not isolated.",
+    "No breaker state-transition trace is recorded; direct no-transport rejections are identified by zero-attempt FAILED_FAST records.",
+    "Retry-After honoring is not exercised: C2-C4 received no 429 in this plan.",
+    "G7 registration and official thresholds remain outstanding.",
+    "The S1 C0/C1 pair did not exercise overall-deadline expiration."
+  ],
+  "mechanisms": {
+    "breaker_zero_attempt_rejections": {
+      "7": 149,
+      "8": 0,
+      "9": 0
+    },
+    "c3_duplicate_executions": 91,
+    "c4_cached_response_ids_match_actual_executions": true,
+    "c4_deduplications": 91,
+    "c4_duplicate_executions": 0,
+    "s3_same_selected_lost_reply_jobs": 91
+  },
+  "noise": {
+    "interpretation": "Three exploratory seeds; observed variation combines host scheduling and seeded synthetic service-time variation. No estimate of statistical significance or host-noise isolation.",
+    "metrics": {
+      "cpu_seconds": {
+        "maximum": 1.006091079,
+        "minimum": 0.9375246409999999,
+        "spread": 0.06856643800000006,
+        "values": [
+          1.006091079,
+          0.9849716629999999,
+          0.9375246409999999
+        ]
+      },
+      "intended_latency_p50": {
+        "maximum": 0.0941128329970553,
+        "minimum": 0.08961683200104886,
+        "spread": 0.004496000996006444,
+        "values": [
+          0.08961683200104886,
+          0.09344494600227193,
+          0.0941128329970553
+        ]
+      },
+      "intended_latency_p95": {
+        "maximum": 0.12151585100146178,
+        "minimum": 0.10866094299854012,
+        "spread": 0.012854908002921661,
+        "values": [
+          0.10866094299854012,
+          0.12151585100146178,
+          0.11894384799816038
+        ]
+      },
+      "intended_latency_p99": {
+        "maximum": 0.1284282939974215,
+        "minimum": 0.12445234700062713,
+        "spread": 0.003975946996794377,
+        "values": [
+          0.12445234700062713,
+          0.12810839200028568,
+          0.1284282939974215
+        ]
+      },
+      "launch_lag_p99": {
+        "maximum": 0.026833383001212407,
+        "minimum": 0.024526599999809662,
+        "spread": 0.0023067830014027457,
+        "values": [
+          0.024526599999809662,
+          0.026833383001212407,
+          0.025625301997205696
+        ]
+      },
+      "loop_lag_p99": {
+        "maximum": 0.026905586000793846,
+        "minimum": 0.022947820001718355,
+        "spread": 0.003957765999075491,
+        "values": [
+          0.022947820001718355,
+          0.026905586000793846,
+          0.026804887998878257
+        ]
+      },
+      "physical_attempts": {
+        "maximum": 600,
+        "minimum": 600,
+        "spread": 0,
+        "values": [
+          600,
+          600,
+          600
+        ]
+      },
+      "success_fraction": {
+        "maximum": 1.0,
+        "minimum": 1.0,
+        "spread": 0.0,
+        "values": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    },
+    "quantile_method": "nearest rank, all logical results; latency measured from intended start",
+    "runs": [
+      1,
+      2,
+      3
+    ]
+  },
+  "offline_pre_batch": {
+    "exit_code": 0,
+    "tests": 338
+  },
+  "paired_comparisons": [
+    {
+      "identical_job_ids_text_and_offsets": true,
+      "identical_provider_configuration": true,
+      "metrics": [
+        {
+          "configuration": "C0",
+          "deduplications": 0,
+          "duplicate_executions": 0,
+          "intended_start_latency_all_seconds": {
+            "p50": 0.09601148200090392,
+            "p95": 1.5183838822880986,
+            "p99": 1.601303545858432
+          },
+          "intended_start_latency_success_seconds": {
+            "p50": 0.09442294266651885,
+            "p95": 0.6151556632861954,
+            "p99": 1.601303545858432
+          },
+          "order": 4,
+          "outcomes": {
+            "FAILED_AFTER_RETRIES": 25,
+            "SUCCESS": 415
+          },
+          "physical_attempts": 561,
+          "provider_decisions": {
+            "RATE_LIMITED": 146,
+            "SERVED": 415
+          },
+          "provider_executions": 415,
+          "provider_receipts": 561,
+          "rate_limited_attempts": 146,
+          "retries": 121,
+          "success_fraction": 0.9431818181818182,
+          "timeouts": 0,
+          "zero_attempt_breaker_rejections": 0
+        },
+        {
+          "configuration": "C1",
+          "deduplications": 0,
+          "duplicate_executions": 0,
+          "intended_start_latency_all_seconds": {
+            "p50": 0.09464359866858274,
+            "p95": 1.517551806285546,
+            "p99": 1.603792971286957
+          },
+          "intended_start_latency_success_seconds": {
+            "p50": 0.09361733566645114,
+            "p95": 0.5797818632849427,
+            "p99": 1.603792971286957
+          },
+          "order": 5,
+          "outcomes": {
+            "FAILED_AFTER_RETRIES": 25,
+            "SUCCESS": 415
+          },
+          "physical_attempts": 559,
+          "provider_decisions": {
+            "RATE_LIMITED": 144,
+            "SERVED": 415
+          },
+          "provider_executions": 415,
+          "provider_receipts": 559,
+          "rate_limited_attempts": 144,
+          "retries": 119,
+          "success_fraction": 0.9431818181818182,
+          "timeouts": 0,
+          "zero_attempt_breaker_rejections": 0
+        }
+      ],
+      "runs": [
+        4,
+        5
+      ],
+      "scenario": "S1"
+    },
+    {
+      "identical_job_ids_text_and_offsets": true,
+      "identical_provider_configuration": true,
+      "metrics": [
+        {
+          "configuration": "C2",
+          "deduplications": 0,
+          "duplicate_executions": 0,
+          "intended_start_latency_all_seconds": {
+            "p50": 0.09832924899819773,
+            "p95": 6.003464896998047,
+            "p99": 6.023446846997832
+          },
+          "intended_start_latency_success_seconds": {
+            "p50": 0.0927893609979975,
+            "p95": 1.4036764169984934,
+            "p99": 4.721630210999866
+          },
+          "order": 6,
+          "outcomes": {
+            "DEADLINE_EXCEEDED": 54,
+            "FAILED_AFTER_RETRIES": 67,
+            "SUCCESS": 479
+          },
+          "physical_attempts": 960,
+          "provider_decisions": {
+            "ERROR_503": 287,
+            "HUNG": 194,
+            "SERVED": 479
+          },
+          "provider_executions": 479,
+          "provider_receipts": 960,
+          "rate_limited_attempts": 0,
+          "retries": 360,
+          "success_fraction": 0.7983333333333333,
+          "timeouts": 194,
+          "zero_attempt_breaker_rejections": 0
+        },
+        {
+          "configuration": "C3",
+          "deduplications": 0,
+          "duplicate_executions": 0,
+          "intended_start_latency_all_seconds": {
+            "p50": 0.08849775200069132,
+            "p95": 0.11732039899943558,
+            "p99": 0.22322503199757193
+          },
+          "intended_start_latency_success_seconds": {
+            "p50": 0.09255176000078791,
+            "p95": 0.11826363800064499,
+            "p99": 0.12521064799803128
+          },
+          "order": 7,
+          "outcomes": {
+            "FAILED_AFTER_RETRIES": 1,
+            "FAILED_FAST": 157,
+            "SUCCESS": 442
+          },
+          "physical_attempts": 457,
+          "provider_decisions": {
+            "ERROR_503": 12,
+            "HUNG": 3,
+            "SERVED": 442
+          },
+          "provider_executions": 442,
+          "provider_receipts": 457,
+          "rate_limited_attempts": 0,
+          "retries": 6,
+          "success_fraction": 0.7366666666666667,
+          "timeouts": 3,
+          "zero_attempt_breaker_rejections": 149
+        }
+      ],
+      "runs": [
+        6,
+        7
+      ],
+      "scenario": "S2"
+    },
+    {
+      "identical_job_ids_text_and_offsets": true,
+      "identical_provider_configuration": true,
+      "metrics": [
+        {
+          "configuration": "C3",
+          "deduplications": 0,
+          "duplicate_executions": 91,
+          "intended_start_latency_all_seconds": {
+            "p50": 0.09416977700166207,
+            "p95": 0.3456108210026301,
+            "p99": 0.41639636700129046
+          },
+          "intended_start_latency_success_seconds": {
+            "p50": 0.09416977700166207,
+            "p95": 0.3456108210026301,
+            "p99": 0.41639636700129046
+          },
+          "order": 8,
+          "outcomes": {
+            "SUCCESS": 600
+          },
+          "physical_attempts": 691,
+          "provider_decisions": {
+            "LOST_REPLY": 91,
+            "SERVED": 600
+          },
+          "provider_executions": 691,
+          "provider_receipts": 691,
+          "rate_limited_attempts": 0,
+          "retries": 91,
+          "success_fraction": 1.0,
+          "timeouts": 0,
+          "zero_attempt_breaker_rejections": 0
+        },
+        {
+          "configuration": "C4",
+          "deduplications": 91,
+          "duplicate_executions": 0,
+          "intended_start_latency_all_seconds": {
+            "p50": 0.09551918799697745,
+            "p95": 0.2714289209994618,
+            "p99": 0.32183912999826125
+          },
+          "intended_start_latency_success_seconds": {
+            "p50": 0.09551918799697745,
+            "p95": 0.2714289209994618,
+            "p99": 0.32183912999826125
+          },
+          "order": 9,
+          "outcomes": {
+            "SUCCESS": 600
+          },
+          "physical_attempts": 691,
+          "provider_decisions": {
+            "DEDUPED": 91,
+            "LOST_REPLY": 91,
+            "SERVED": 509
+          },
+          "provider_executions": 600,
+          "provider_receipts": 691,
+          "rate_limited_attempts": 0,
+          "retries": 91,
+          "success_fraction": 1.0,
+          "timeouts": 0,
+          "zero_attempt_breaker_rejections": 0
+        }
+      ],
+      "runs": [
+        8,
+        9
+      ],
+      "scenario": "S3"
+    }
+  ],
+  "plan": {
+    "path": "results/pilot/exploratory-g6-plan-73ca4535be254f1ea59fa047ed5f6c7d.json",
+    "sha256": "e2045505ba484101d82d7e0d05d01bbc8896a3e7976f89a3bd8de5df3cebc5ff"
+  },
+  "post_batch_validation": "Required final offline suite and filesystem verification are reported separately after this immutable summary is created.",
+  "recommendation": "Proceed to reviewed G7 registration; do not treat these exploratory seeds or policies as registered official experiments.",
+  "registered": false,
+  "runs": [
+    {
+      "command": "source scripts/env.sh && PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m outage_test.runner S0 C0 9101",
+      "configuration": "C0",
+      "cpu_seconds": 1.006091079,
+      "deduplications": 0,
+      "duplicate_executions": 0,
+      "exit_code": 0,
+      "failures": 0,
+      "health_limits": {
+        "frozen": false,
+        "launch_lag_p99": 0.05,
+        "loop_lag_p99": 0.035
+      },
+      "http_statuses": {
+        "200": 600
+      },
+      "intended_start_latency_all_seconds": {
+        "p50": 0.08961683200104886,
+        "p95": 0.10866094299854012,
+        "p99": 0.12445234700062713
+      },
+      "intended_start_latency_success_seconds": {
+        "p50": 0.08961683200104886,
+        "p95": 0.10866094299854012,
+        "p99": 0.12445234700062713
+      },
+      "launch_lag_p99": 0.024526599999809662,
+      "lifecycle": {
+        "forced_kill": false,
+        "pid": 60833,
+        "reaped": true,
+        "returncode": 0,
+        "unexpected_exit": false
+      },
+      "logical_jobs": 600,
+      "loop_lag_p99": 0.022947820001718355,
+      "order": 1,
+      "outcomes": {
+        "SUCCESS": 600
+      },
+      "physical_attempts": 600,
+      "provider_configuration": {
+        "bucket_capacity": 10.0,
+        "capacity": 128,
+        "idempotency": false,
+        "loss_fraction": 0.15,
+        "max_pending": 256,
+        "outage_end": 35.0,
+        "outage_start": 20.0,
+        "rate": 10.0,
+        "scenario": "S0",
+        "seed": 9101
+      },
+      "provider_counters": {
+        "buckets": {
+          "0": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "1": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "10": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "11": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "12": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "13": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "14": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "15": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "16": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "17": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "18": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "19": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "2": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "20": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "21": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "22": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "23": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "24": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "25": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "26": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "27": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "28": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "29": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "3": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "30": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "31": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "32": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "33": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "34": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "35": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "36": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "37": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "38": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "39": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "4": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "40": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "41": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "42": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "43": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "44": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "45": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "46": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "47": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "48": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "49": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "5": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "50": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "51": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "52": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "53": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "54": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "55": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "56": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "57": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "58": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "59": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "6": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "7": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "8": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "9": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          }
+        },
+        "rejected": 0
+      },
+      "provider_decisions": {
+        "SERVED": 600
+      },
+      "provider_executions": 600,
+      "provider_receipts": 600,
+      "rate_limited_attempts": 0,
+      "reconciliation_passed": true,
+      "result_file": "results/pilot/exploratory-S0-C0-1-c06cfa307b5f492ca14227a50cca778d.json",
+      "retries": 0,
+      "sampling": {
+        "finished_at": 22175.123146761,
+        "method": "fixed-anchor-catch-up",
+        "origin": 22115.132028562,
+        "sample_count": 5998,
+        "scheduled_ticks": 5998,
+        "stop_requested_at": 22175.120782572,
+        "unobserved_tail_ticks": 0
+      },
+      "scenario": "S0",
+      "seed": 9101,
+      "sha256": "e86fa25a5d57493760a8a1106dcf3e2965bd164edb1a9b8f783e8f3db71db869",
+      "size_bytes": 974225,
+      "status": "VALID",
+      "success_fraction": 1.0,
+      "successes": 600,
+      "timeouts": 0,
+      "transport_failures": {},
+      "validity": {
+        "reasons": [],
+        "status": "VALID"
+      },
+      "wall_seconds": 60.3708484480012,
+      "workload_sha256": "924d021b9cce2e0cd8b07c83126c1ae7caa50f8fa91c285a72f8bd74cc2535c5",
+      "zero_attempt_breaker_rejections": 0
+    },
+    {
+      "command": "source scripts/env.sh && PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m outage_test.runner S0 C0 9105",
+      "configuration": "C0",
+      "cpu_seconds": 0.9849716629999999,
+      "deduplications": 0,
+      "duplicate_executions": 0,
+      "exit_code": 0,
+      "failures": 0,
+      "health_limits": {
+        "frozen": false,
+        "launch_lag_p99": 0.05,
+        "loop_lag_p99": 0.035
+      },
+      "http_statuses": {
+        "200": 600
+      },
+      "intended_start_latency_all_seconds": {
+        "p50": 0.09344494600227193,
+        "p95": 0.12151585100146178,
+        "p99": 0.12810839200028568
+      },
+      "intended_start_latency_success_seconds": {
+        "p50": 0.09344494600227193,
+        "p95": 0.12151585100146178,
+        "p99": 0.12810839200028568
+      },
+      "launch_lag_p99": 0.026833383001212407,
+      "lifecycle": {
+        "forced_kill": false,
+        "pid": 61068,
+        "reaped": true,
+        "returncode": 0,
+        "unexpected_exit": false
+      },
+      "logical_jobs": 600,
+      "loop_lag_p99": 0.026905586000793846,
+      "order": 2,
+      "outcomes": {
+        "SUCCESS": 600
+      },
+      "physical_attempts": 600,
+      "provider_configuration": {
+        "bucket_capacity": 10.0,
+        "capacity": 128,
+        "idempotency": false,
+        "loss_fraction": 0.15,
+        "max_pending": 256,
+        "outage_end": 35.0,
+        "outage_start": 20.0,
+        "rate": 10.0,
+        "scenario": "S0",
+        "seed": 9105
+      },
+      "provider_counters": {
+        "buckets": {
+          "0": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "1": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "10": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "11": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "12": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "13": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "14": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "15": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "16": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "17": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "18": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "19": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "2": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "20": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "21": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "22": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "23": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "24": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "25": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "26": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "27": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "28": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "29": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "3": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "30": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "31": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "32": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "33": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "34": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "35": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "36": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "37": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "38": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "39": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "4": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "40": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "41": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "42": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "43": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "44": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "45": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "46": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "47": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "48": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "49": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "5": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "50": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "51": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "52": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "53": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "54": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "55": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "56": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "57": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "58": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "59": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "6": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "7": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "8": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "9": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          }
+        },
+        "rejected": 0
+      },
+      "provider_decisions": {
+        "SERVED": 600
+      },
+      "provider_executions": 600,
+      "provider_receipts": 600,
+      "rate_limited_attempts": 0,
+      "reconciliation_passed": true,
+      "result_file": "results/pilot/exploratory-S0-C0-1-e74ed10d278d446a864f313b1c65d600.json",
+      "retries": 0,
+      "sampling": {
+        "finished_at": 22235.822698945,
+        "method": "fixed-anchor-catch-up",
+        "origin": 22175.821622,
+        "sample_count": 5999,
+        "scheduled_ticks": 5999,
+        "stop_requested_at": 22235.820372221,
+        "unobserved_tail_ticks": 0
+      },
+      "scenario": "S0",
+      "seed": 9105,
+      "sha256": "1c3a3bef4cf53c00e3a0eb60a808875ec647902797d2a6059ccc1797fe9f9bce",
+      "size_bytes": 973738,
+      "status": "VALID",
+      "success_fraction": 1.0,
+      "successes": 600,
+      "timeouts": 0,
+      "transport_failures": {},
+      "validity": {
+        "reasons": [],
+        "status": "VALID"
+      },
+      "wall_seconds": 60.3639752099989,
+      "workload_sha256": "bb4970185a497249bbd107e7ff0c3c04434ebf99b6e6395fd36a6770fbb6b36b",
+      "zero_attempt_breaker_rejections": 0
+    },
+    {
+      "command": "source scripts/env.sh && PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m outage_test.runner S0 C0 9106",
+      "configuration": "C0",
+      "cpu_seconds": 0.9375246409999999,
+      "deduplications": 0,
+      "duplicate_executions": 0,
+      "exit_code": 0,
+      "failures": 0,
+      "health_limits": {
+        "frozen": false,
+        "launch_lag_p99": 0.05,
+        "loop_lag_p99": 0.035
+      },
+      "http_statuses": {
+        "200": 600
+      },
+      "intended_start_latency_all_seconds": {
+        "p50": 0.0941128329970553,
+        "p95": 0.11894384799816038,
+        "p99": 0.1284282939974215
+      },
+      "intended_start_latency_success_seconds": {
+        "p50": 0.0941128329970553,
+        "p95": 0.11894384799816038,
+        "p99": 0.1284282939974215
+      },
+      "launch_lag_p99": 0.025625301997205696,
+      "lifecycle": {
+        "forced_kill": false,
+        "pid": 61400,
+        "reaped": true,
+        "returncode": 0,
+        "unexpected_exit": false
+      },
+      "logical_jobs": 600,
+      "loop_lag_p99": 0.026804887998878257,
+      "order": 3,
+      "outcomes": {
+        "SUCCESS": 600
+      },
+      "physical_attempts": 600,
+      "provider_configuration": {
+        "bucket_capacity": 10.0,
+        "capacity": 128,
+        "idempotency": false,
+        "loss_fraction": 0.15,
+        "max_pending": 256,
+        "outage_end": 35.0,
+        "outage_start": 20.0,
+        "rate": 10.0,
+        "scenario": "S0",
+        "seed": 9106
+      },
+      "provider_counters": {
+        "buckets": {
+          "0": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "1": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "10": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "11": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "12": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "13": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "14": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "15": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "16": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "17": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "18": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "19": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "2": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "20": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "21": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "22": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "23": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "24": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "25": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "26": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "27": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "28": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "29": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "3": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "30": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "31": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "32": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "33": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "34": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "35": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "36": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "37": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "38": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "39": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "4": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "40": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "41": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "42": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "43": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "44": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "45": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "46": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "47": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "48": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "49": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "5": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "50": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "51": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "52": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "53": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "54": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "55": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "56": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "57": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "58": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "59": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "6": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "7": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "8": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "9": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          }
+        },
+        "rejected": 0
+      },
+      "provider_decisions": {
+        "SERVED": 600
+      },
+      "provider_executions": 600,
+      "provider_receipts": 600,
+      "rate_limited_attempts": 0,
+      "reconciliation_passed": true,
+      "result_file": "results/pilot/exploratory-S0-C0-1-ab2812c9201b4ad2b08ddfc7fcccbf42.json",
+      "retries": 0,
+      "sampling": {
+        "finished_at": 22296.641739193,
+        "method": "fixed-anchor-catch-up",
+        "origin": 22236.626838764,
+        "sample_count": 5998,
+        "scheduled_ticks": 5998,
+        "stop_requested_at": 22296.614686794,
+        "unobserved_tail_ticks": 0
+      },
+      "scenario": "S0",
+      "seed": 9106,
+      "sha256": "1bfb230dff8dfbbffda778d43ddb08e2148b6978b3b07ebdefc0489062aee981",
+      "size_bytes": 973738,
+      "status": "VALID",
+      "success_fraction": 1.0,
+      "successes": 600,
+      "timeouts": 0,
+      "transport_failures": {},
+      "validity": {
+        "reasons": [],
+        "status": "VALID"
+      },
+      "wall_seconds": 60.441780444998585,
+      "workload_sha256": "ab655d0c06248132e6c95fbcc0797a1ea11cf874811f362cbfa40ef71d4a2011",
+      "zero_attempt_breaker_rejections": 0
+    },
+    {
+      "command": "source scripts/env.sh && PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m outage_test.runner S1 C0 9102",
+      "configuration": "C0",
+      "cpu_seconds": 1.073938418,
+      "deduplications": 0,
+      "duplicate_executions": 0,
+      "exit_code": 0,
+      "failures": 25,
+      "health_limits": {
+        "frozen": false,
+        "launch_lag_p99": 0.05,
+        "loop_lag_p99": 0.035
+      },
+      "http_statuses": {
+        "200": 415,
+        "429": 146
+      },
+      "intended_start_latency_all_seconds": {
+        "p50": 0.09601148200090392,
+        "p95": 1.5183838822880986,
+        "p99": 1.601303545858432
+      },
+      "intended_start_latency_success_seconds": {
+        "p50": 0.09442294266651885,
+        "p95": 0.6151556632861954,
+        "p99": 1.601303545858432
+      },
+      "launch_lag_p99": 0.025140802001260454,
+      "lifecycle": {
+        "forced_kill": false,
+        "pid": 61656,
+        "reaped": true,
+        "returncode": 0,
+        "unexpected_exit": false
+      },
+      "logical_jobs": 440,
+      "loop_lag_p99": 0.02649992200167617,
+      "order": 4,
+      "outcomes": {
+        "FAILED_AFTER_RETRIES": 25,
+        "SUCCESS": 415
+      },
+      "physical_attempts": 561,
+      "provider_configuration": {
+        "bucket_capacity": 10.0,
+        "capacity": 128,
+        "idempotency": false,
+        "loss_fraction": 0.15,
+        "max_pending": 256,
+        "outage_end": 35.0,
+        "outage_start": 20.0,
+        "rate": 10.0,
+        "scenario": "S1",
+        "seed": 9102
+      },
+      "provider_counters": {
+        "buckets": {
+          "0": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "1": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "10": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "11": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "12": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "13": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "14": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "15": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "16": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "17": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "18": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "19": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "2": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "20": {
+            "SERVED": 14,
+            "executed": 14,
+            "receipts": 14,
+            "resource_overflow": 0
+          },
+          "21": {
+            "SERVED": 14,
+            "executed": 14,
+            "receipts": 14,
+            "resource_overflow": 0
+          },
+          "22": {
+            "RATE_LIMITED": 4,
+            "SERVED": 11,
+            "executed": 11,
+            "receipts": 15,
+            "resource_overflow": 0
+          },
+          "23": {
+            "RATE_LIMITED": 12,
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 22,
+            "resource_overflow": 0
+          },
+          "24": {
+            "RATE_LIMITED": 17,
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 27,
+            "resource_overflow": 0
+          },
+          "25": {
+            "RATE_LIMITED": 18,
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 28,
+            "resource_overflow": 0
+          },
+          "26": {
+            "RATE_LIMITED": 21,
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 31,
+            "resource_overflow": 0
+          },
+          "27": {
+            "RATE_LIMITED": 18,
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 28,
+            "resource_overflow": 0
+          },
+          "28": {
+            "RATE_LIMITED": 22,
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 32,
+            "resource_overflow": 0
+          },
+          "29": {
+            "RATE_LIMITED": 22,
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 32,
+            "resource_overflow": 0
+          },
+          "3": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "30": {
+            "RATE_LIMITED": 11,
+            "SERVED": 9,
+            "executed": 9,
+            "receipts": 20,
+            "resource_overflow": 0
+          },
+          "31": {
+            "RATE_LIMITED": 1,
+            "SERVED": 9,
+            "executed": 9,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "32": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "33": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "34": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "35": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "36": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "37": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "38": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "39": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "4": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "40": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "41": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "42": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "43": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "44": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "45": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "46": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "47": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "48": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "49": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "5": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "50": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "51": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "52": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "53": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "54": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "55": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "56": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "57": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "58": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "59": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "6": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "7": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "8": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "9": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          }
+        },
+        "rejected": 0
+      },
+      "provider_decisions": {
+        "RATE_LIMITED": 146,
+        "SERVED": 415
+      },
+      "provider_executions": 415,
+      "provider_receipts": 561,
+      "rate_limited_attempts": 146,
+      "reconciliation_passed": true,
+      "result_file": "results/pilot/exploratory-S1-C0-1-7bcf094329984dbeb095e352ad6928c5.json",
+      "retries": 121,
+      "sampling": {
+        "finished_at": 22357.348788343,
+        "method": "fixed-anchor-catch-up",
+        "origin": 22297.426939543,
+        "sample_count": 5991,
+        "scheduled_ticks": 5991,
+        "stop_requested_at": 22357.338339887,
+        "unobserved_tail_ticks": 0
+      },
+      "scenario": "S1",
+      "seed": 9102,
+      "sha256": "8505f18f3d23b0361f04243f57aee926f6b6d0fb5da60ef4485e21115ddfaeb7",
+      "size_bytes": 841335,
+      "status": "VALID",
+      "success_fraction": 0.9431818181818182,
+      "successes": 415,
+      "timeouts": 0,
+      "transport_failures": {},
+      "validity": {
+        "reasons": [],
+        "status": "VALID"
+      },
+      "wall_seconds": 60.28035591799926,
+      "workload_sha256": "9eaa7883eb8693d548957c40f96539fca0908a18c36122d38295d9653f8e63c6",
+      "zero_attempt_breaker_rejections": 0
+    },
+    {
+      "command": "source scripts/env.sh && PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m outage_test.runner S1 C1 9102",
+      "configuration": "C1",
+      "cpu_seconds": 0.952936527,
+      "deduplications": 0,
+      "duplicate_executions": 0,
+      "exit_code": 0,
+      "failures": 25,
+      "health_limits": {
+        "frozen": false,
+        "launch_lag_p99": 0.05,
+        "loop_lag_p99": 0.035
+      },
+      "http_statuses": {
+        "200": 415,
+        "429": 144
+      },
+      "intended_start_latency_all_seconds": {
+        "p50": 0.09464359866858274,
+        "p95": 1.517551806285546,
+        "p99": 1.603792971286957
+      },
+      "intended_start_latency_success_seconds": {
+        "p50": 0.09361733566645114,
+        "p95": 0.5797818632849427,
+        "p99": 1.603792971286957
+      },
+      "launch_lag_p99": 0.025226444142131044,
+      "lifecycle": {
+        "forced_kill": false,
+        "pid": 61856,
+        "reaped": true,
+        "returncode": 0,
+        "unexpected_exit": false
+      },
+      "logical_jobs": 440,
+      "loop_lag_p99": 0.02620594400286791,
+      "order": 5,
+      "outcomes": {
+        "FAILED_AFTER_RETRIES": 25,
+        "SUCCESS": 415
+      },
+      "physical_attempts": 559,
+      "provider_configuration": {
+        "bucket_capacity": 10.0,
+        "capacity": 128,
+        "idempotency": false,
+        "loss_fraction": 0.15,
+        "max_pending": 256,
+        "outage_end": 35.0,
+        "outage_start": 20.0,
+        "rate": 10.0,
+        "scenario": "S1",
+        "seed": 9102
+      },
+      "provider_counters": {
+        "buckets": {
+          "0": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "1": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "10": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "11": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "12": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "13": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "14": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "15": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "16": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "17": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "18": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "19": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "2": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "20": {
+            "SERVED": 14,
+            "executed": 14,
+            "receipts": 14,
+            "resource_overflow": 0
+          },
+          "21": {
+            "SERVED": 14,
+            "executed": 14,
+            "receipts": 14,
+            "resource_overflow": 0
+          },
+          "22": {
+            "RATE_LIMITED": 4,
+            "SERVED": 11,
+            "executed": 11,
+            "receipts": 15,
+            "resource_overflow": 0
+          },
+          "23": {
+            "RATE_LIMITED": 12,
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 22,
+            "resource_overflow": 0
+          },
+          "24": {
+            "RATE_LIMITED": 19,
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 29,
+            "resource_overflow": 0
+          },
+          "25": {
+            "RATE_LIMITED": 17,
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 27,
+            "resource_overflow": 0
+          },
+          "26": {
+            "RATE_LIMITED": 19,
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 29,
+            "resource_overflow": 0
+          },
+          "27": {
+            "RATE_LIMITED": 19,
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 29,
+            "resource_overflow": 0
+          },
+          "28": {
+            "RATE_LIMITED": 20,
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 30,
+            "resource_overflow": 0
+          },
+          "29": {
+            "RATE_LIMITED": 22,
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 32,
+            "resource_overflow": 0
+          },
+          "3": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "30": {
+            "RATE_LIMITED": 10,
+            "SERVED": 9,
+            "executed": 9,
+            "receipts": 19,
+            "resource_overflow": 0
+          },
+          "31": {
+            "RATE_LIMITED": 2,
+            "SERVED": 9,
+            "executed": 9,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "32": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "33": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "34": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "35": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "36": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "37": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "38": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "39": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "4": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "40": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "41": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "42": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "43": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "44": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "45": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "46": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "47": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "48": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "49": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "5": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "50": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "51": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "52": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "53": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "54": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "55": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "56": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "57": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "58": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "59": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "6": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "7": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "8": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          },
+          "9": {
+            "SERVED": 6,
+            "executed": 6,
+            "receipts": 6,
+            "resource_overflow": 0
+          }
+        },
+        "rejected": 0
+      },
+      "provider_decisions": {
+        "RATE_LIMITED": 144,
+        "SERVED": 415
+      },
+      "provider_executions": 415,
+      "provider_receipts": 559,
+      "rate_limited_attempts": 144,
+      "reconciliation_passed": true,
+      "result_file": "results/pilot/exploratory-S1-C1-1-e0dc5b6e1ff84f66a3784be64ca8f72b.json",
+      "retries": 119,
+      "sampling": {
+        "finished_at": 22417.994709641,
+        "method": "fixed-anchor-catch-up",
+        "origin": 22358.074400977,
+        "sample_count": 5991,
+        "scheduled_ticks": 5991,
+        "stop_requested_at": 22417.986397107,
+        "unobserved_tail_ticks": 0
+      },
+      "scenario": "S1",
+      "seed": 9102,
+      "sha256": "5c60c1d0b3a68731be362e662ee2f928ace8a3adfb76eb16c4271f1a45e113ef",
+      "size_bytes": 839847,
+      "status": "VALID",
+      "success_fraction": 0.9431818181818182,
+      "successes": 415,
+      "timeouts": 0,
+      "transport_failures": {},
+      "validity": {
+        "reasons": [],
+        "status": "VALID"
+      },
+      "wall_seconds": 60.303670643999794,
+      "workload_sha256": "9eaa7883eb8693d548957c40f96539fca0908a18c36122d38295d9653f8e63c6",
+      "zero_attempt_breaker_rejections": 0
+    },
+    {
+      "command": "source scripts/env.sh && PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m outage_test.runner S2 C2 9103",
+      "configuration": "C2",
+      "cpu_seconds": 1.243996407,
+      "deduplications": 0,
+      "duplicate_executions": 0,
+      "exit_code": 0,
+      "failures": 121,
+      "health_limits": {
+        "frozen": false,
+        "launch_lag_p99": 0.05,
+        "loop_lag_p99": 0.035
+      },
+      "http_statuses": {
+        "200": 479,
+        "503": 287
+      },
+      "intended_start_latency_all_seconds": {
+        "p50": 0.09832924899819773,
+        "p95": 6.003464896998047,
+        "p99": 6.023446846997832
+      },
+      "intended_start_latency_success_seconds": {
+        "p50": 0.0927893609979975,
+        "p95": 1.4036764169984934,
+        "p99": 4.721630210999866
+      },
+      "launch_lag_p99": 0.02594711099663982,
+      "lifecycle": {
+        "forced_kill": false,
+        "pid": 62064,
+        "reaped": true,
+        "returncode": 0,
+        "unexpected_exit": false
+      },
+      "logical_jobs": 600,
+      "loop_lag_p99": 0.02613872999791056,
+      "order": 6,
+      "outcomes": {
+        "DEADLINE_EXCEEDED": 54,
+        "FAILED_AFTER_RETRIES": 67,
+        "SUCCESS": 479
+      },
+      "physical_attempts": 960,
+      "provider_configuration": {
+        "bucket_capacity": 10.0,
+        "capacity": 128,
+        "idempotency": false,
+        "loss_fraction": 0.15,
+        "max_pending": 256,
+        "outage_end": 35.0,
+        "outage_start": 20.0,
+        "rate": 10.0,
+        "scenario": "S2",
+        "seed": 9103
+      },
+      "provider_counters": {
+        "buckets": {
+          "0": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "1": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "10": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "11": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "12": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "13": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "14": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "15": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "16": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "17": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "18": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "19": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "2": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "20": {
+            "ERROR_503": 12,
+            "HUNG": 6,
+            "executed": 0,
+            "receipts": 18,
+            "resource_overflow": 0
+          },
+          "21": {
+            "ERROR_503": 15,
+            "HUNG": 6,
+            "executed": 0,
+            "receipts": 21,
+            "resource_overflow": 0
+          },
+          "22": {
+            "ERROR_503": 24,
+            "HUNG": 8,
+            "executed": 0,
+            "receipts": 32,
+            "resource_overflow": 0
+          },
+          "23": {
+            "ERROR_503": 25,
+            "HUNG": 10,
+            "executed": 0,
+            "receipts": 35,
+            "resource_overflow": 0
+          },
+          "24": {
+            "ERROR_503": 25,
+            "HUNG": 8,
+            "executed": 0,
+            "receipts": 33,
+            "resource_overflow": 0
+          },
+          "25": {
+            "ERROR_503": 20,
+            "HUNG": 17,
+            "executed": 0,
+            "receipts": 37,
+            "resource_overflow": 0
+          },
+          "26": {
+            "ERROR_503": 13,
+            "HUNG": 16,
+            "executed": 0,
+            "receipts": 29,
+            "resource_overflow": 0
+          },
+          "27": {
+            "ERROR_503": 13,
+            "HUNG": 13,
+            "executed": 0,
+            "receipts": 26,
+            "resource_overflow": 0
+          },
+          "28": {
+            "ERROR_503": 21,
+            "HUNG": 20,
+            "executed": 0,
+            "receipts": 41,
+            "resource_overflow": 0
+          },
+          "29": {
+            "ERROR_503": 18,
+            "HUNG": 15,
+            "executed": 0,
+            "receipts": 33,
+            "resource_overflow": 0
+          },
+          "3": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "30": {
+            "ERROR_503": 29,
+            "HUNG": 15,
+            "executed": 0,
+            "receipts": 44,
+            "resource_overflow": 0
+          },
+          "31": {
+            "ERROR_503": 14,
+            "HUNG": 17,
+            "executed": 0,
+            "receipts": 31,
+            "resource_overflow": 0
+          },
+          "32": {
+            "ERROR_503": 23,
+            "HUNG": 15,
+            "executed": 0,
+            "receipts": 38,
+            "resource_overflow": 0
+          },
+          "33": {
+            "ERROR_503": 14,
+            "HUNG": 17,
+            "executed": 0,
+            "receipts": 31,
+            "resource_overflow": 0
+          },
+          "34": {
+            "ERROR_503": 21,
+            "HUNG": 11,
+            "executed": 0,
+            "receipts": 32,
+            "resource_overflow": 0
+          },
+          "35": {
+            "SERVED": 29,
+            "executed": 29,
+            "receipts": 29,
+            "resource_overflow": 0
+          },
+          "36": {
+            "SERVED": 19,
+            "executed": 19,
+            "receipts": 19,
+            "resource_overflow": 0
+          },
+          "37": {
+            "SERVED": 11,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "38": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "39": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "4": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "40": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "41": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "42": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "43": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "44": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "45": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "46": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "47": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "48": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "49": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "5": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "50": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "51": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "52": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "53": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "54": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "55": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "56": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "57": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "58": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "59": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "6": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "7": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "8": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "9": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          }
+        },
+        "rejected": 0
+      },
+      "provider_decisions": {
+        "ERROR_503": 287,
+        "HUNG": 194,
+        "SERVED": 479
+      },
+      "provider_executions": 479,
+      "provider_receipts": 960,
+      "rate_limited_attempts": 0,
+      "reconciliation_passed": true,
+      "result_file": "results/pilot/exploratory-S2-C2-1-4a7c5b09105f4e26a22466b9cb6f825a.json",
+      "retries": 360,
+      "sampling": {
+        "finished_at": 22478.760340168,
+        "method": "fixed-anchor-catch-up",
+        "origin": 22418.789024912,
+        "sample_count": 5996,
+        "scheduled_ticks": 5997,
+        "stop_requested_at": 22478.760231519,
+        "unobserved_tail_ticks": 1
+      },
+      "scenario": "S2",
+      "seed": 9103,
+      "sha256": "667206908711713b1f7f2e311ba5bc5c174bffbc5bc487b9bbd4584627252ddc",
+      "size_bytes": 1212873,
+      "status": "VALID",
+      "success_fraction": 0.7983333333333333,
+      "successes": 479,
+      "timeouts": 194,
+      "transport_failures": {
+        "TIMEOUT": 194
+      },
+      "validity": {
+        "reasons": [],
+        "status": "VALID"
+      },
+      "wall_seconds": 60.402639143998385,
+      "workload_sha256": "d9e19cfb9c943b249c1e7b0573095d4922ce11204fa9047859d83ac43e8a8eb6",
+      "zero_attempt_breaker_rejections": 0
+    },
+    {
+      "command": "source scripts/env.sh && PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m outage_test.runner S2 C3 9103",
+      "configuration": "C3",
+      "cpu_seconds": 0.859113541,
+      "deduplications": 0,
+      "duplicate_executions": 0,
+      "exit_code": 0,
+      "failures": 158,
+      "health_limits": {
+        "frozen": false,
+        "launch_lag_p99": 0.05,
+        "loop_lag_p99": 0.035
+      },
+      "http_statuses": {
+        "200": 442,
+        "503": 12
+      },
+      "intended_start_latency_all_seconds": {
+        "p50": 0.08849775200069132,
+        "p95": 0.11732039899943558,
+        "p99": 0.22322503199757193
+      },
+      "intended_start_latency_success_seconds": {
+        "p50": 0.09255176000078791,
+        "p95": 0.11826363800064499,
+        "p99": 0.12521064799803128
+      },
+      "launch_lag_p99": 0.026039111999850206,
+      "lifecycle": {
+        "forced_kill": false,
+        "pid": 62285,
+        "reaped": true,
+        "returncode": 0,
+        "unexpected_exit": false
+      },
+      "logical_jobs": 600,
+      "loop_lag_p99": 0.026282520004315302,
+      "order": 7,
+      "outcomes": {
+        "FAILED_AFTER_RETRIES": 1,
+        "FAILED_FAST": 157,
+        "SUCCESS": 442
+      },
+      "physical_attempts": 457,
+      "provider_configuration": {
+        "bucket_capacity": 10.0,
+        "capacity": 128,
+        "idempotency": false,
+        "loss_fraction": 0.15,
+        "max_pending": 256,
+        "outage_end": 35.0,
+        "outage_start": 20.0,
+        "rate": 10.0,
+        "scenario": "S2",
+        "seed": 9103
+      },
+      "provider_counters": {
+        "buckets": {
+          "0": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "1": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "10": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "11": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "12": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "13": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "14": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "15": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "16": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "17": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "18": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "19": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "2": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "20": {
+            "ERROR_503": 10,
+            "HUNG": 3,
+            "executed": 0,
+            "receipts": 13,
+            "resource_overflow": 0
+          },
+          "25": {
+            "ERROR_503": 1,
+            "executed": 0,
+            "receipts": 1,
+            "resource_overflow": 0
+          },
+          "3": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "30": {
+            "ERROR_503": 1,
+            "executed": 0,
+            "receipts": 1,
+            "resource_overflow": 0
+          },
+          "35": {
+            "SERVED": 2,
+            "executed": 2,
+            "receipts": 2,
+            "resource_overflow": 0
+          },
+          "36": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "37": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "38": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "39": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "4": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "40": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "41": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "42": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "43": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "44": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "45": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "46": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "47": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "48": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "49": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "5": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "50": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "51": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "52": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "53": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "54": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "55": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "56": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "57": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "58": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "59": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "6": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "7": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "8": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "9": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          }
+        },
+        "rejected": 0
+      },
+      "provider_decisions": {
+        "ERROR_503": 12,
+        "HUNG": 3,
+        "SERVED": 442
+      },
+      "provider_executions": 442,
+      "provider_receipts": 457,
+      "rate_limited_attempts": 0,
+      "reconciliation_passed": true,
+      "result_file": "results/pilot/exploratory-S2-C3-1-7f55ade6a4a64f6e98e38b7f702c8a74.json",
+      "retries": 6,
+      "sampling": {
+        "finished_at": 22539.531064212,
+        "method": "fixed-anchor-catch-up",
+        "origin": 22479.540432763,
+        "sample_count": 5998,
+        "scheduled_ticks": 5998,
+        "stop_requested_at": 22539.528718665,
+        "unobserved_tail_ticks": 0
+      },
+      "scenario": "S2",
+      "seed": 9103,
+      "sha256": "a069f3dcd9f72050f5d738d59ce3e9e090e2413593cd7ecf9597bc5fc1ef9e5f",
+      "size_bytes": 850987,
+      "status": "VALID",
+      "success_fraction": 0.7366666666666667,
+      "successes": 442,
+      "timeouts": 3,
+      "transport_failures": {
+        "TIMEOUT": 3
+      },
+      "validity": {
+        "reasons": [],
+        "status": "VALID"
+      },
+      "wall_seconds": 60.404556278997916,
+      "workload_sha256": "d9e19cfb9c943b249c1e7b0573095d4922ce11204fa9047859d83ac43e8a8eb6",
+      "zero_attempt_breaker_rejections": 149
+    },
+    {
+      "command": "source scripts/env.sh && PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m outage_test.runner S3 C3 9104",
+      "configuration": "C3",
+      "cpu_seconds": 1.078929718,
+      "deduplications": 0,
+      "duplicate_executions": 91,
+      "exit_code": 0,
+      "failures": 0,
+      "health_limits": {
+        "frozen": false,
+        "launch_lag_p99": 0.05,
+        "loop_lag_p99": 0.035
+      },
+      "http_statuses": {
+        "200": 600
+      },
+      "intended_start_latency_all_seconds": {
+        "p50": 0.09416977700166207,
+        "p95": 0.3456108210026301,
+        "p99": 0.41639636700129046
+      },
+      "intended_start_latency_success_seconds": {
+        "p50": 0.09416977700166207,
+        "p95": 0.3456108210026301,
+        "p99": 0.41639636700129046
+      },
+      "launch_lag_p99": 0.025199627999246133,
+      "lifecycle": {
+        "forced_kill": false,
+        "pid": 62493,
+        "reaped": true,
+        "returncode": 0,
+        "unexpected_exit": false
+      },
+      "logical_jobs": 600,
+      "loop_lag_p99": 0.026364316003309796,
+      "order": 8,
+      "outcomes": {
+        "SUCCESS": 600
+      },
+      "physical_attempts": 691,
+      "provider_configuration": {
+        "bucket_capacity": 10.0,
+        "capacity": 128,
+        "idempotency": true,
+        "loss_fraction": 0.15,
+        "max_pending": 256,
+        "outage_end": 35.0,
+        "outage_start": 20.0,
+        "rate": 10.0,
+        "scenario": "S3",
+        "seed": 9104
+      },
+      "provider_counters": {
+        "buckets": {
+          "0": {
+            "LOST_REPLY": 1,
+            "SERVED": 10,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "1": {
+            "LOST_REPLY": 1,
+            "SERVED": 10,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "10": {
+            "LOST_REPLY": 2,
+            "SERVED": 10,
+            "executed": 12,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "11": {
+            "LOST_REPLY": 1,
+            "SERVED": 10,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "12": {
+            "LOST_REPLY": 1,
+            "SERVED": 10,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "13": {
+            "LOST_REPLY": 1,
+            "SERVED": 10,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "14": {
+            "LOST_REPLY": 1,
+            "SERVED": 10,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "15": {
+            "LOST_REPLY": 2,
+            "SERVED": 10,
+            "executed": 12,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "16": {
+            "LOST_REPLY": 3,
+            "SERVED": 10,
+            "executed": 13,
+            "receipts": 13,
+            "resource_overflow": 0
+          },
+          "17": {
+            "LOST_REPLY": 1,
+            "SERVED": 10,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "18": {
+            "LOST_REPLY": 2,
+            "SERVED": 10,
+            "executed": 12,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "19": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "2": {
+            "LOST_REPLY": 3,
+            "SERVED": 10,
+            "executed": 13,
+            "receipts": 13,
+            "resource_overflow": 0
+          },
+          "20": {
+            "LOST_REPLY": 2,
+            "SERVED": 10,
+            "executed": 12,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "21": {
+            "LOST_REPLY": 2,
+            "SERVED": 9,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "22": {
+            "LOST_REPLY": 2,
+            "SERVED": 10,
+            "executed": 12,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "23": {
+            "SERVED": 11,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "24": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "25": {
+            "LOST_REPLY": 2,
+            "SERVED": 9,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "26": {
+            "LOST_REPLY": 3,
+            "SERVED": 10,
+            "executed": 13,
+            "receipts": 13,
+            "resource_overflow": 0
+          },
+          "27": {
+            "LOST_REPLY": 2,
+            "SERVED": 10,
+            "executed": 12,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "28": {
+            "LOST_REPLY": 2,
+            "SERVED": 11,
+            "executed": 13,
+            "receipts": 13,
+            "resource_overflow": 0
+          },
+          "29": {
+            "LOST_REPLY": 1,
+            "SERVED": 10,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "3": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "30": {
+            "LOST_REPLY": 5,
+            "SERVED": 9,
+            "executed": 14,
+            "receipts": 14,
+            "resource_overflow": 0
+          },
+          "31": {
+            "LOST_REPLY": 5,
+            "SERVED": 10,
+            "executed": 15,
+            "receipts": 15,
+            "resource_overflow": 0
+          },
+          "32": {
+            "LOST_REPLY": 2,
+            "SERVED": 10,
+            "executed": 12,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "33": {
+            "LOST_REPLY": 1,
+            "SERVED": 10,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "34": {
+            "LOST_REPLY": 1,
+            "SERVED": 11,
+            "executed": 12,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "35": {
+            "LOST_REPLY": 1,
+            "SERVED": 10,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "36": {
+            "LOST_REPLY": 2,
+            "SERVED": 10,
+            "executed": 12,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "37": {
+            "LOST_REPLY": 1,
+            "SERVED": 10,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "38": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "39": {
+            "LOST_REPLY": 1,
+            "SERVED": 10,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "4": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "40": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "41": {
+            "LOST_REPLY": 5,
+            "SERVED": 9,
+            "executed": 14,
+            "receipts": 14,
+            "resource_overflow": 0
+          },
+          "42": {
+            "LOST_REPLY": 1,
+            "SERVED": 11,
+            "executed": 12,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "43": {
+            "LOST_REPLY": 2,
+            "SERVED": 10,
+            "executed": 12,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "44": {
+            "LOST_REPLY": 1,
+            "SERVED": 10,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "45": {
+            "LOST_REPLY": 2,
+            "SERVED": 10,
+            "executed": 12,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "46": {
+            "LOST_REPLY": 3,
+            "SERVED": 10,
+            "executed": 13,
+            "receipts": 13,
+            "resource_overflow": 0
+          },
+          "47": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "48": {
+            "LOST_REPLY": 1,
+            "SERVED": 10,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "49": {
+            "LOST_REPLY": 2,
+            "SERVED": 10,
+            "executed": 12,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "5": {
+            "LOST_REPLY": 3,
+            "SERVED": 10,
+            "executed": 13,
+            "receipts": 13,
+            "resource_overflow": 0
+          },
+          "50": {
+            "LOST_REPLY": 1,
+            "SERVED": 9,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "51": {
+            "SERVED": 11,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "52": {
+            "LOST_REPLY": 2,
+            "SERVED": 10,
+            "executed": 12,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "53": {
+            "LOST_REPLY": 4,
+            "SERVED": 9,
+            "executed": 13,
+            "receipts": 13,
+            "resource_overflow": 0
+          },
+          "54": {
+            "SERVED": 11,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "55": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "56": {
+            "LOST_REPLY": 1,
+            "SERVED": 10,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "57": {
+            "LOST_REPLY": 2,
+            "SERVED": 10,
+            "executed": 12,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "58": {
+            "LOST_REPLY": 2,
+            "SERVED": 10,
+            "executed": 12,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "59": {
+            "LOST_REPLY": 1,
+            "SERVED": 10,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "6": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "7": {
+            "LOST_REPLY": 1,
+            "SERVED": 10,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "8": {
+            "LOST_REPLY": 1,
+            "SERVED": 10,
+            "executed": 11,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "9": {
+            "LOST_REPLY": 2,
+            "SERVED": 10,
+            "executed": 12,
+            "receipts": 12,
+            "resource_overflow": 0
+          }
+        },
+        "rejected": 0
+      },
+      "provider_decisions": {
+        "LOST_REPLY": 91,
+        "SERVED": 600
+      },
+      "provider_executions": 691,
+      "provider_receipts": 691,
+      "rate_limited_attempts": 0,
+      "reconciliation_passed": true,
+      "result_file": "results/pilot/exploratory-S3-C3-1-5c03374545ea4dcbb73ad81a690d64df.json",
+      "retries": 91,
+      "sampling": {
+        "finished_at": 22600.255750886,
+        "method": "fixed-anchor-catch-up",
+        "origin": 22540.294309159,
+        "sample_count": 5995,
+        "scheduled_ticks": 5996,
+        "stop_requested_at": 22600.255666251,
+        "unobserved_tail_ticks": 1
+      },
+      "scenario": "S3",
+      "seed": 9104,
+      "sha256": "b9ce1c3b129883c9d3619514b0337f2ca6c1f81eb38eed74d03031fd3f7de8ee",
+      "size_bytes": 1041772,
+      "status": "VALID",
+      "success_fraction": 1.0,
+      "successes": 600,
+      "timeouts": 0,
+      "transport_failures": {
+        "CONNECTION_FAILURE": 91
+      },
+      "validity": {
+        "reasons": [],
+        "status": "VALID"
+      },
+      "wall_seconds": 60.390157862002525,
+      "workload_sha256": "e36cdca2094d42a0739e7b47a161d191869ae26ad3181d7d9df3e32866a94ea8",
+      "zero_attempt_breaker_rejections": 0
+    },
+    {
+      "command": "source scripts/env.sh && PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m outage_test.runner S3 C4 9104",
+      "configuration": "C4",
+      "cpu_seconds": 0.9681078409999999,
+      "deduplications": 91,
+      "duplicate_executions": 0,
+      "exit_code": 0,
+      "failures": 0,
+      "health_limits": {
+        "frozen": false,
+        "launch_lag_p99": 0.05,
+        "loop_lag_p99": 0.035
+      },
+      "http_statuses": {
+        "200": 600
+      },
+      "intended_start_latency_all_seconds": {
+        "p50": 0.09551918799697745,
+        "p95": 0.2714289209994618,
+        "p99": 0.32183912999826125
+      },
+      "intended_start_latency_success_seconds": {
+        "p50": 0.09551918799697745,
+        "p95": 0.2714289209994618,
+        "p99": 0.32183912999826125
+      },
+      "launch_lag_p99": 0.02640459299728093,
+      "lifecycle": {
+        "forced_kill": false,
+        "pid": 62722,
+        "reaped": true,
+        "returncode": 0,
+        "unexpected_exit": false
+      },
+      "logical_jobs": 600,
+      "loop_lag_p99": 0.025715097999636782,
+      "order": 9,
+      "outcomes": {
+        "SUCCESS": 600
+      },
+      "physical_attempts": 691,
+      "provider_configuration": {
+        "bucket_capacity": 10.0,
+        "capacity": 128,
+        "idempotency": true,
+        "loss_fraction": 0.15,
+        "max_pending": 256,
+        "outage_end": 35.0,
+        "outage_start": 20.0,
+        "rate": 10.0,
+        "scenario": "S3",
+        "seed": 9104
+      },
+      "provider_counters": {
+        "buckets": {
+          "0": {
+            "DEDUPED": 1,
+            "LOST_REPLY": 1,
+            "SERVED": 9,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "1": {
+            "DEDUPED": 1,
+            "LOST_REPLY": 1,
+            "SERVED": 9,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "10": {
+            "DEDUPED": 2,
+            "LOST_REPLY": 2,
+            "SERVED": 8,
+            "executed": 10,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "11": {
+            "DEDUPED": 1,
+            "LOST_REPLY": 1,
+            "SERVED": 9,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "12": {
+            "DEDUPED": 1,
+            "LOST_REPLY": 1,
+            "SERVED": 9,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "13": {
+            "DEDUPED": 1,
+            "LOST_REPLY": 1,
+            "SERVED": 9,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "14": {
+            "DEDUPED": 1,
+            "LOST_REPLY": 1,
+            "SERVED": 9,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "15": {
+            "DEDUPED": 2,
+            "LOST_REPLY": 2,
+            "SERVED": 8,
+            "executed": 10,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "16": {
+            "DEDUPED": 3,
+            "LOST_REPLY": 3,
+            "SERVED": 7,
+            "executed": 10,
+            "receipts": 13,
+            "resource_overflow": 0
+          },
+          "17": {
+            "DEDUPED": 1,
+            "LOST_REPLY": 1,
+            "SERVED": 9,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "18": {
+            "DEDUPED": 2,
+            "LOST_REPLY": 2,
+            "SERVED": 8,
+            "executed": 10,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "19": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "2": {
+            "DEDUPED": 2,
+            "LOST_REPLY": 3,
+            "SERVED": 7,
+            "executed": 10,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "20": {
+            "DEDUPED": 2,
+            "LOST_REPLY": 2,
+            "SERVED": 8,
+            "executed": 10,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "21": {
+            "DEDUPED": 1,
+            "LOST_REPLY": 2,
+            "SERVED": 8,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "22": {
+            "DEDUPED": 2,
+            "LOST_REPLY": 2,
+            "SERVED": 8,
+            "executed": 10,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "23": {
+            "DEDUPED": 1,
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "24": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "25": {
+            "DEDUPED": 1,
+            "LOST_REPLY": 2,
+            "SERVED": 8,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "26": {
+            "DEDUPED": 3,
+            "LOST_REPLY": 3,
+            "SERVED": 7,
+            "executed": 10,
+            "receipts": 13,
+            "resource_overflow": 0
+          },
+          "27": {
+            "DEDUPED": 2,
+            "LOST_REPLY": 2,
+            "SERVED": 8,
+            "executed": 10,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "28": {
+            "DEDUPED": 3,
+            "LOST_REPLY": 2,
+            "SERVED": 8,
+            "executed": 10,
+            "receipts": 13,
+            "resource_overflow": 0
+          },
+          "29": {
+            "DEDUPED": 1,
+            "LOST_REPLY": 1,
+            "SERVED": 9,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "3": {
+            "DEDUPED": 1,
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "30": {
+            "DEDUPED": 4,
+            "LOST_REPLY": 5,
+            "SERVED": 5,
+            "executed": 10,
+            "receipts": 14,
+            "resource_overflow": 0
+          },
+          "31": {
+            "DEDUPED": 5,
+            "LOST_REPLY": 5,
+            "SERVED": 5,
+            "executed": 10,
+            "receipts": 15,
+            "resource_overflow": 0
+          },
+          "32": {
+            "DEDUPED": 2,
+            "LOST_REPLY": 2,
+            "SERVED": 8,
+            "executed": 10,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "33": {
+            "DEDUPED": 1,
+            "LOST_REPLY": 1,
+            "SERVED": 9,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "34": {
+            "DEDUPED": 2,
+            "LOST_REPLY": 1,
+            "SERVED": 9,
+            "executed": 10,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "35": {
+            "DEDUPED": 1,
+            "LOST_REPLY": 1,
+            "SERVED": 9,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "36": {
+            "DEDUPED": 2,
+            "LOST_REPLY": 2,
+            "SERVED": 8,
+            "executed": 10,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "37": {
+            "DEDUPED": 1,
+            "LOST_REPLY": 1,
+            "SERVED": 9,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "38": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "39": {
+            "DEDUPED": 1,
+            "LOST_REPLY": 1,
+            "SERVED": 9,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "4": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "40": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "41": {
+            "DEDUPED": 4,
+            "LOST_REPLY": 5,
+            "SERVED": 5,
+            "executed": 10,
+            "receipts": 14,
+            "resource_overflow": 0
+          },
+          "42": {
+            "DEDUPED": 2,
+            "LOST_REPLY": 1,
+            "SERVED": 9,
+            "executed": 10,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "43": {
+            "DEDUPED": 2,
+            "LOST_REPLY": 2,
+            "SERVED": 8,
+            "executed": 10,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "44": {
+            "DEDUPED": 1,
+            "LOST_REPLY": 1,
+            "SERVED": 9,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "45": {
+            "DEDUPED": 2,
+            "LOST_REPLY": 2,
+            "SERVED": 8,
+            "executed": 10,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "46": {
+            "DEDUPED": 3,
+            "LOST_REPLY": 3,
+            "SERVED": 7,
+            "executed": 10,
+            "receipts": 13,
+            "resource_overflow": 0
+          },
+          "47": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "48": {
+            "DEDUPED": 1,
+            "LOST_REPLY": 1,
+            "SERVED": 9,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "49": {
+            "DEDUPED": 2,
+            "LOST_REPLY": 2,
+            "SERVED": 8,
+            "executed": 10,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "5": {
+            "DEDUPED": 3,
+            "LOST_REPLY": 3,
+            "SERVED": 7,
+            "executed": 10,
+            "receipts": 13,
+            "resource_overflow": 0
+          },
+          "50": {
+            "LOST_REPLY": 1,
+            "SERVED": 9,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "51": {
+            "DEDUPED": 1,
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "52": {
+            "DEDUPED": 2,
+            "LOST_REPLY": 2,
+            "SERVED": 8,
+            "executed": 10,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "53": {
+            "DEDUPED": 3,
+            "LOST_REPLY": 4,
+            "SERVED": 6,
+            "executed": 10,
+            "receipts": 13,
+            "resource_overflow": 0
+          },
+          "54": {
+            "DEDUPED": 1,
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "55": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "56": {
+            "DEDUPED": 1,
+            "LOST_REPLY": 1,
+            "SERVED": 9,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "57": {
+            "DEDUPED": 2,
+            "LOST_REPLY": 2,
+            "SERVED": 8,
+            "executed": 10,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "58": {
+            "DEDUPED": 2,
+            "LOST_REPLY": 2,
+            "SERVED": 8,
+            "executed": 10,
+            "receipts": 12,
+            "resource_overflow": 0
+          },
+          "59": {
+            "DEDUPED": 1,
+            "LOST_REPLY": 1,
+            "SERVED": 9,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "6": {
+            "SERVED": 10,
+            "executed": 10,
+            "receipts": 10,
+            "resource_overflow": 0
+          },
+          "7": {
+            "DEDUPED": 1,
+            "LOST_REPLY": 1,
+            "SERVED": 9,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "8": {
+            "DEDUPED": 1,
+            "LOST_REPLY": 1,
+            "SERVED": 9,
+            "executed": 10,
+            "receipts": 11,
+            "resource_overflow": 0
+          },
+          "9": {
+            "DEDUPED": 2,
+            "LOST_REPLY": 2,
+            "SERVED": 8,
+            "executed": 10,
+            "receipts": 12,
+            "resource_overflow": 0
+          }
+        },
+        "rejected": 0
+      },
+      "provider_decisions": {
+        "DEDUPED": 91,
+        "LOST_REPLY": 91,
+        "SERVED": 509
+      },
+      "provider_executions": 600,
+      "provider_receipts": 691,
+      "rate_limited_attempts": 0,
+      "reconciliation_passed": true,
+      "result_file": "results/pilot/exploratory-S3-C4-1-9472086449d74aef890cbe0a316ee142.json",
+      "retries": 91,
+      "sampling": {
+        "finished_at": 22661.116270564,
+        "method": "fixed-anchor-catch-up",
+        "origin": 22601.12573675,
+        "sample_count": 5998,
+        "scheduled_ticks": 5998,
+        "stop_requested_at": 22661.110977679,
+        "unobserved_tail_ticks": 0
+      },
+      "scenario": "S3",
+      "seed": 9104,
+      "sha256": "f9027e1ee6b0a6bb8edeb0491204ce26fdfcd7f87527da65847011488814d18d",
+      "size_bytes": 1084294,
+      "status": "VALID",
+      "success_fraction": 1.0,
+      "successes": 600,
+      "timeouts": 0,
+      "transport_failures": {
+        "CONNECTION_FAILURE": 91
+      },
+      "validity": {
+        "reasons": [],
+        "status": "VALID"
+      },
+      "wall_seconds": 60.382312514997466,
+      "workload_sha256": "e36cdca2094d42a0739e7b47a161d191869ae26ad3181d7d9df3e32866a94ea8",
+      "zero_attempt_breaker_rejections": 0
+    }
+  ],
+  "task": "P15/G6"
+}

@@ -1,0 +1,254 @@
+schema_version: 1
+status: PROPOSED
+frozen: false
+metadata:
+  approval: Owner review and merge to main are required before freezing. This proposal authorizes no official execution.
+  source_head: f1d3d386fabfce165edb85850b8accd7ae125151
+  brief: No Project 3 brief file found; decision rules follow the owner task specification.
+  proposed_source_sha256:
+    src/outage_test/client.py: 18b5438073d8b9b226df15f38f1213b31936c37b4f3c2bd2448ab8259a24eb31
+    src/outage_test/provider.py: c64545af9bf2c604f9324f8118fb8c6c23cea230ce1a058645c6c89f1586a9f9
+    src/outage_test/faults.py: e417c17583b66af14a718edd922eb7879d5b0d574588c66637be75534f39f903
+    src/outage_test/harness.py: 9943eaf3a8e777f06f48ed43cb79be5e64b3551061b3c2985ae6f754e1517f88
+    src/outage_test/runner.py: a92f1253c90e42893e17d59fcc846a5bfd6d6970a623492793aa650d0324c59d
+    requirements-run.lock: 286186df84a288e4628f48e85cdafacfef7c0abe7e34e1729f6b95ba6a940d52
+    requirements-dev.lock: 10608c5bf1b0f8be5f5683d498d1b1b6970c1e288e8511c073af146dd0a5d2a7
+    .github/workflows/ci.yml: 830ec0c29126978995206b75731565e6f5003b3245f683f788e8d7757b6a727b
+  publication:
+    label: PRIVACY-SANITIZED DERIVATIVE
+    originals_intentionally_unpublished: true
+    replacement: Only the exact absolute project directory prefix was replaced with <PROJECT_ROOT>; no other evidence
+      bytes changed. The public log additionally has the declared one-line derivative header. The plan retains its
+      original schema; this metadata labels it as a derivative.
+    plan_source_sha256: e2045505ba484101d82d7e0d05d01bbc8896a3e7976f89a3bd8de5df3cebc5ff
+    plan_public_sha256: 7b2a1ce6bf78eb73e81a5951e15c08ec08635263b71ae7916540b025d3ec1bb5
+    plan_replacements: 1
+    log_source_sha256: d5d03cff8302ac052465ac92980bb8dc4a68c03b9914e1b14944b55f0799a822
+    log_public_sha256: 374ae4d12a786c3ba53d0e31f14a2d1fe05f885afbbe15d9751dfa86ad3bc48d
+    log_replacements: 18
+    log_header: PRIVACY-SANITIZED DERIVATIVE; original intentionally unpublished; source SHA256=d5d03cff8302ac052465ac92980bb8dc4a68c03b9914e1b14944b55f0799a822
+    summary_sha256: 8906b5608503f1fc593f283e304ff516effd90ff98d9648809299b2f7f51d66d
+  limitations:
+  - Synthetic local-only provider, not real AI APIs.
+  - Provider explicitly honors idempotency keys; no proof of exactly-once behavior for real APIs.
+  - Seeded decisions do not remove host scheduling variation; S1 token-bucket outcomes depend on arrival timing,
+    not a common exact 429 trace.
+  - Single pilot pairs are not significance tests; three official rounds also give limited precision.
+  - Pilot S1 did not exercise C2 Retry-After handling.
+  - C3 reduced S2 attempts but also successful requests in the exploratory pilot.
+  - Three S0 pilot replications used different seeds and cannot isolate pure environmental noise.
+  - No pilot efficacy observation is an official result.
+clients:
+  C0:
+    max_attempts: 4
+    attempt_timeout_seconds: 5.0
+    logical_deadline_seconds: null
+    fixed_retry_delay_seconds: 0.5
+    full_jitter: false
+    honor_retry_after: false
+    circuit_breaker: false
+    idempotency: false
+  C1:
+    max_attempts: 4
+    attempt_timeout_seconds: 2.0
+    logical_deadline_seconds: 6.0
+    fixed_retry_delay_seconds: 0.5
+    full_jitter: false
+    honor_retry_after: false
+    circuit_breaker: false
+    idempotency: false
+  C2:
+    max_attempts: 4
+    attempt_timeout_seconds: 2.0
+    logical_deadline_seconds: 6.0
+    fixed_retry_delay_seconds: null
+    full_jitter: true
+    honor_retry_after: true
+    circuit_breaker: false
+    idempotency: false
+  C3:
+    max_attempts: 4
+    attempt_timeout_seconds: 2.0
+    logical_deadline_seconds: 6.0
+    fixed_retry_delay_seconds: null
+    full_jitter: true
+    honor_retry_after: true
+    circuit_breaker: true
+    idempotency: false
+  C4:
+    max_attempts: 4
+    attempt_timeout_seconds: 2.0
+    logical_deadline_seconds: 6.0
+    fixed_retry_delay_seconds: null
+    full_jitter: true
+    honor_retry_after: true
+    circuit_breaker: true
+    idempotency: true
+client_semantics:
+  retryable_http:
+  - 429
+  - 500-599
+  retryable_failures:
+  - TIMEOUT
+  - CONNECTION_FAILURE
+  terminal:
+  - other non-200 HTTP
+  - INVALID_RESPONSE on invalid 200
+  - CANCELLED
+  - PROGRAMMING_ERROR
+  - breaker rejection
+  backoff:
+    base_seconds: 0.25
+    cap_seconds: 2.0
+    policy: uniform(0,min(2.0,0.25*2**min(ordinal-1,3))); per-job RNG SHA256(JSON([seed,job_id])); independent of
+      config and order
+  retry_after: Only ASCII decimal delta-seconds on 429; C2-C4 use max(full_jitter, Retry-After). Invalid/date values
+    ignored. Minimum >= remaining deadline fails fast; other waits clipped to remaining time.
+  deadline: 'C1-C4: timeout=min(2,remaining); now >= deadline wins even over success. C0 has no logical policy deadline;
+    scheduler still caps submit at 30 seconds. Four attempts maximum for every config.'
+  breaker:
+    window: 20
+    minimum_samples: 10
+    failure_fraction: 0.5
+    open_seconds: 5
+    relevant_failures:
+    - TIMEOUT
+    - CONNECTION_FAILURE
+    - 500-599
+    neutral:
+    - '429'
+    - other 4xx
+    - invalid 200
+    - cancellation
+    - programming error
+    semantics: CLOSED uses completion-ordered last 20 attempt observations; neutral/success observations count as
+      nonfailures in denominator. At >=10 samples and >=50% failures OPEN. OPEN rejects without HTTP; after 5s HALF_OPEN
+      admits one probe. Relevant failure reopens; validated success closes and clears history; neutral releases
+      probe but stays HALF_OPEN. Late CLOSED completions cannot finish a probe. No retry sleep after OPEN.
+  idempotency: Only C4 sends SHA256(UTF8(job_id)) as Idempotency-Key on every attempt. S3 enables provider support
+    for every config; C0-C3 send no key. Provider serializes same-job work, binds key to (job,text), rejects conflicting
+    payload, caches executed result before lost reply, replays without execution or ordinal advance; unexecuted
+    inactive bindings are removed. Cache resets per run.
+validity:
+  sample_interval_seconds: 0.01
+  sampling: fixed-anchor-catch-up
+  loop_lag_p99_seconds: 0.035
+  launch_lag_p99_seconds: 0.05
+  percentile: 'nearest-rank: sorted(samples)[ceil(0.99*n)-1]'
+  rules:
+  - exactly_one_final_record_per_planned_job
+  - unique_job_and_attempt_and_receipt_ids
+  - one_to_one_client_attempt_provider_receipt_job_match
+  - no_missing_or_extra_receipts
+  - no_overflow_unfinished_or_aborted_receipts
+  - expected_applied_faults_identical
+  - full_provider_configuration_matches_registration
+  - provider_exit_zero_reaped_no_forced_kill_or_unexpected_exit
+  - no_runner_or_logical_record_errors
+  - raw_health_samples_and_counts_reconcile
+  - sampling_ticks_and_unobserved_tail_accounted
+  - full_environment_timing_and_source_provenance
+  - fail_closed_absent_malformed_nonfinite_or_unhealthy
+  calibration: PROPOSED 35 ms from prospective pilot-v2 training plus margin and held-out validation on the observed
+    local host; not automatically transferable. Launch remains 50 ms. No official limit is approved yet.
+invalid_handling:
+  max_total_attempts_per_slot: 3
+  preserve_all_invalid: true
+  exclude_invalid_from_statistics: true
+  exhausted_slot_and_cell: INCOMPLETE
+  retry_same_seed_parameters_and_limits: true
+  retry_order: Retry immediately in the same ordered slot until VALID or three total attempts; preserve every attempt;
+    continue other slots and report all incomplete slots.
+decision:
+  valid_runs: 3
+  aggregation: Median of the three valid per-run primary metrics; guardrails must pass in EVERY paired round. No
+    pooling or significance claim.
+  formulas:
+    B: median(baseline)
+    C: median(candidate)
+    I: (B-C)/B
+    S: (max(baseline)-min(baseline))/B
+  relative_threshold: 0.2
+  precedence:
+  - HARMFUL
+  - EFFECTIVE
+  - NO MEASURABLE EFFECT
+  - INCONCLUSIVE
+  effective: I >= 0.20 and I > S and every guardrail passes; additionally apply the S3 C4 gate.
+  harmful: Any guardrail violation, or I <= -0.20 and -I > S. Guardrail harm takes precedence.
+  no_measurable_effect: abs(I) < 0.20 or I <= S, provided no harmful guardrail violation.
+  inconclusive: All other cases, absent/undefined required metrics, fewer than three valid paired runs, or failed
+    S3 C4 efficacy gate without demonstrated harm.
+  zero_baseline:
+    both_zero: NO MEASURABLE EFFECT unless a guardrail is violated
+    candidate_positive: HARMFUL if candidate median exceeds raw baseline range; otherwise NO MEASURABLE EFFECT,
+      unless a guardrail is violated
+    ratios: I and S are null when B=0; compare raw nonnegative values; never divide by zero
+  missing_recovery: Finite baseline with no candidate recovery is a harmful guardrail failure; no recovery in both
+    arms is undefined and INCONCLUSIVE.
+  metric_definitions:
+    success_fraction: SUCCESS final records / planned jobs; failures remain in denominator.
+    extra_attempts: sum(max(0,number of attempts for each logical job - 1)); zero-attempt breaker rejections add
+      zero.
+    outside_outage_success_fraction: Success fraction among jobs with intended_offset outside [20,35).
+    recovery_seconds: Earliest completion_offset of a SUCCESS for a job with intended_offset >=35, minus 35 seconds;
+      absent if none.
+    p99: Nearest-rank p99 over all logical latencies, including failures.
+  metrics:
+    S0:
+      primary: p99_logical_latency_seconds
+      definition: Nearest-rank p99 of completion_offset minus intended_offset for all planned logical records, including
+        failures.
+      guardrails:
+      - candidate_physical_attempts <= baseline_physical_attempts
+      - candidate_p99 <= baseline_p99 + max(0.10 * baseline_p99, 0.020 seconds)
+      - candidate_success_fraction >= baseline_success_fraction
+    S1:
+      primary: attempts_per_logical_request
+      definition: Total client physical attempts divided by all planned logical jobs (440).
+      guardrails:
+      - candidate_success_fraction >= baseline_success_fraction - 0.01
+      - candidate_p99_logical_latency_seconds <= baseline_p99_logical_latency_seconds
+    S2:
+      primary: outage_provider_attempts_per_outage_issued_job
+      definition: All provider receipts with arrival_time in [20,35), divided by the 150 planned jobs with intended_offset
+        in [20,35).
+      guardrails:
+      - candidate_outside_outage_success_fraction >= baseline_outside_outage_success_fraction
+      - candidate_recovery_seconds <= baseline_recovery_seconds + 5.0
+      - candidate_p99_logical_latency_seconds <= baseline_p99_logical_latency_seconds
+    S3:
+      primary: duplicate_provider_executions
+      definition: Sum over job IDs of max(0, executed receipt count - 1). Deduplicated receipts are not executions.
+      guardrails:
+      - candidate_success_fraction >= baseline_success_fraction
+      - candidate_extra_attempts <= baseline_extra_attempts
+      efficacy_gate: C4_EFFECTIVE requires zero duplicates in each of three C4 runs and positive duplicates in each
+        corresponding C0 run
+  comparisons:
+    primary:
+    - C0:C4
+    secondary:
+    - C0:C1
+    - C0:C2
+    - C0:C3
+    stepwise:
+    - C0:C1
+    - C1:C2
+    - C2:C3
+    - C3:C4
+    applicability: Primary for S0-S3; secondary and stepwise for S1-S3 only because S0 has only C0,C4; same four
+      verdict classes. S3 C4 versus C3 also requires positive corresponding C0 duplicates for efficacy.
+implementation_dependencies:
+  P17:
+  - Official runner, create-only official writer, explicit registration checksum enforcement, 51-slot executor and
+    capped INVALID retries are absent; existing CLI only writes exploratory runs.
+  - Official validity must require full measurements, sampling and environment/provenance instead of legacy fixture-only
+    health flags; current validator requires frozen=false.
+  - Compute outage-window attempts, outside-window success, recovery and other registered metrics from existing
+    schedule/records/ledger; no registered metric API exists.
+  P19:
+  - Implement paired guardrails, zero-safe decision aggregation, stepwise four-class verdicts, incomplete-slot reporting
+    and official report generation.
+  - Before official runs, record approved registration/source checksums and environment; none are frozen by this
+    PR.

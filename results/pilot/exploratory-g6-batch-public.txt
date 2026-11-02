@@ -1,0 +1,49 @@
+PRIVACY-SANITIZED DERIVATIVE; original intentionally unpublished; source SHA256=d5d03cff8302ac052465ac92980bb8dc4a68c03b9914e1b14944b55f0799a822
+BATCH_START plan=results/pilot/exploratory-g6-plan-73ca4535be254f1ea59fa047ed5f6c7d.json plan_sha256=e2045505ba484101d82d7e0d05d01bbc8896a3e7976f89a3bd8de5df3cebc5ff
+PYTHON <PROJECT_ROOT>/.venv/bin/python
+RUN_BEGIN {"order":1,"scenario":"S0","configuration":"C0","seed":9101}
+COMMAND source scripts/env.sh && PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m outage_test.runner S0 C0 9101
+{"result_file": "<PROJECT_ROOT>/results/pilot/exploratory-S0-C0-1-c06cfa307b5f492ca14227a50cca778d.json", "sha256": "e86fa25a5d57493760a8a1106dcf3e2965bd164edb1a9b8f783e8f3db71db869", "validity": {"status": "VALID", "reasons": []}, "jobs": 600, "attempts": 600, "receipts": 600, "executions": 600, "health": {"loop_lag_p99": 0.022947820001718355, "launch_lag_p99": 0.024526599999809662, "cpu_seconds": 1.006091079, "loop_sample_count": 5998, "launch_sample_count": 600, "sample_interval": 0.01, "limits": {"loop_lag_p99": 0.035, "launch_lag_p99": 0.05, "frozen": false}}, "lifecycle": {"pid": 60833, "returncode": 0, "reaped": true, "forced_kill": false, "unexpected_exit": false}, "wall_seconds": 60.3708484480012}
+RUN_EXIT {"order":1,"exit_code":0}
+PYTHON <PROJECT_ROOT>/.venv/bin/python
+RUN_BEGIN {"order":2,"scenario":"S0","configuration":"C0","seed":9105}
+COMMAND source scripts/env.sh && PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m outage_test.runner S0 C0 9105
+{"result_file": "<PROJECT_ROOT>/results/pilot/exploratory-S0-C0-1-e74ed10d278d446a864f313b1c65d600.json", "sha256": "1c3a3bef4cf53c00e3a0eb60a808875ec647902797d2a6059ccc1797fe9f9bce", "validity": {"status": "VALID", "reasons": []}, "jobs": 600, "attempts": 600, "receipts": 600, "executions": 600, "health": {"loop_lag_p99": 0.026905586000793846, "launch_lag_p99": 0.026833383001212407, "cpu_seconds": 0.9849716629999999, "loop_sample_count": 5999, "launch_sample_count": 600, "sample_interval": 0.01, "limits": {"loop_lag_p99": 0.035, "launch_lag_p99": 0.05, "frozen": false}}, "lifecycle": {"pid": 61068, "returncode": 0, "reaped": true, "forced_kill": false, "unexpected_exit": false}, "wall_seconds": 60.3639752099989}
+RUN_EXIT {"order":2,"exit_code":0}
+PYTHON <PROJECT_ROOT>/.venv/bin/python
+RUN_BEGIN {"order":3,"scenario":"S0","configuration":"C0","seed":9106}
+COMMAND source scripts/env.sh && PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m outage_test.runner S0 C0 9106
+{"result_file": "<PROJECT_ROOT>/results/pilot/exploratory-S0-C0-1-ab2812c9201b4ad2b08ddfc7fcccbf42.json", "sha256": "1bfb230dff8dfbbffda778d43ddb08e2148b6978b3b07ebdefc0489062aee981", "validity": {"status": "VALID", "reasons": []}, "jobs": 600, "attempts": 600, "receipts": 600, "executions": 600, "health": {"loop_lag_p99": 0.026804887998878257, "launch_lag_p99": 0.025625301997205696, "cpu_seconds": 0.9375246409999999, "loop_sample_count": 5998, "launch_sample_count": 600, "sample_interval": 0.01, "limits": {"loop_lag_p99": 0.035, "launch_lag_p99": 0.05, "frozen": false}}, "lifecycle": {"pid": 61400, "returncode": 0, "reaped": true, "forced_kill": false, "unexpected_exit": false}, "wall_seconds": 60.441780444998585}
+RUN_EXIT {"order":3,"exit_code":0}
+PYTHON <PROJECT_ROOT>/.venv/bin/python
+RUN_BEGIN {"order":4,"scenario":"S1","configuration":"C0","seed":9102}
+COMMAND source scripts/env.sh && PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m outage_test.runner S1 C0 9102
+{"result_file": "<PROJECT_ROOT>/results/pilot/exploratory-S1-C0-1-7bcf094329984dbeb095e352ad6928c5.json", "sha256": "8505f18f3d23b0361f04243f57aee926f6b6d0fb5da60ef4485e21115ddfaeb7", "validity": {"status": "VALID", "reasons": []}, "jobs": 440, "attempts": 561, "receipts": 561, "executions": 415, "health": {"loop_lag_p99": 0.02649992200167617, "launch_lag_p99": 0.025140802001260454, "cpu_seconds": 1.073938418, "loop_sample_count": 5991, "launch_sample_count": 440, "sample_interval": 0.01, "limits": {"loop_lag_p99": 0.035, "launch_lag_p99": 0.05, "frozen": false}}, "lifecycle": {"pid": 61656, "returncode": 0, "reaped": true, "forced_kill": false, "unexpected_exit": false}, "wall_seconds": 60.28035591799926}
+RUN_EXIT {"order":4,"exit_code":0}
+PYTHON <PROJECT_ROOT>/.venv/bin/python
+RUN_BEGIN {"order":5,"scenario":"S1","configuration":"C1","seed":9102}
+COMMAND source scripts/env.sh && PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m outage_test.runner S1 C1 9102
+{"result_file": "<PROJECT_ROOT>/results/pilot/exploratory-S1-C1-1-e0dc5b6e1ff84f66a3784be64ca8f72b.json", "sha256": "5c60c1d0b3a68731be362e662ee2f928ace8a3adfb76eb16c4271f1a45e113ef", "validity": {"status": "VALID", "reasons": []}, "jobs": 440, "attempts": 559, "receipts": 559, "executions": 415, "health": {"loop_lag_p99": 0.02620594400286791, "launch_lag_p99": 0.025226444142131044, "cpu_seconds": 0.952936527, "loop_sample_count": 5991, "launch_sample_count": 440, "sample_interval": 0.01, "limits": {"loop_lag_p99": 0.035, "launch_lag_p99": 0.05, "frozen": false}}, "lifecycle": {"pid": 61856, "returncode": 0, "reaped": true, "forced_kill": false, "unexpected_exit": false}, "wall_seconds": 60.303670643999794}
+RUN_EXIT {"order":5,"exit_code":0}
+PYTHON <PROJECT_ROOT>/.venv/bin/python
+RUN_BEGIN {"order":6,"scenario":"S2","configuration":"C2","seed":9103}
+COMMAND source scripts/env.sh && PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m outage_test.runner S2 C2 9103
+{"result_file": "<PROJECT_ROOT>/results/pilot/exploratory-S2-C2-1-4a7c5b09105f4e26a22466b9cb6f825a.json", "sha256": "667206908711713b1f7f2e311ba5bc5c174bffbc5bc487b9bbd4584627252ddc", "validity": {"status": "VALID", "reasons": []}, "jobs": 600, "attempts": 960, "receipts": 960, "executions": 479, "health": {"loop_lag_p99": 0.02613872999791056, "launch_lag_p99": 0.02594711099663982, "cpu_seconds": 1.243996407, "loop_sample_count": 5996, "launch_sample_count": 600, "sample_interval": 0.01, "limits": {"loop_lag_p99": 0.035, "launch_lag_p99": 0.05, "frozen": false}}, "lifecycle": {"pid": 62064, "returncode": 0, "reaped": true, "forced_kill": false, "unexpected_exit": false}, "wall_seconds": 60.402639143998385}
+RUN_EXIT {"order":6,"exit_code":0}
+PYTHON <PROJECT_ROOT>/.venv/bin/python
+RUN_BEGIN {"order":7,"scenario":"S2","configuration":"C3","seed":9103}
+COMMAND source scripts/env.sh && PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m outage_test.runner S2 C3 9103
+{"result_file": "<PROJECT_ROOT>/results/pilot/exploratory-S2-C3-1-7f55ade6a4a64f6e98e38b7f702c8a74.json", "sha256": "a069f3dcd9f72050f5d738d59ce3e9e090e2413593cd7ecf9597bc5fc1ef9e5f", "validity": {"status": "VALID", "reasons": []}, "jobs": 600, "attempts": 457, "receipts": 457, "executions": 442, "health": {"loop_lag_p99": 0.026282520004315302, "launch_lag_p99": 0.026039111999850206, "cpu_seconds": 0.859113541, "loop_sample_count": 5998, "launch_sample_count": 600, "sample_interval": 0.01, "limits": {"loop_lag_p99": 0.035, "launch_lag_p99": 0.05, "frozen": false}}, "lifecycle": {"pid": 62285, "returncode": 0, "reaped": true, "forced_kill": false, "unexpected_exit": false}, "wall_seconds": 60.404556278997916}
+RUN_EXIT {"order":7,"exit_code":0}
+PYTHON <PROJECT_ROOT>/.venv/bin/python
+RUN_BEGIN {"order":8,"scenario":"S3","configuration":"C3","seed":9104}
+COMMAND source scripts/env.sh && PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m outage_test.runner S3 C3 9104
+{"result_file": "<PROJECT_ROOT>/results/pilot/exploratory-S3-C3-1-5c03374545ea4dcbb73ad81a690d64df.json", "sha256": "b9ce1c3b129883c9d3619514b0337f2ca6c1f81eb38eed74d03031fd3f7de8ee", "validity": {"status": "VALID", "reasons": []}, "jobs": 600, "attempts": 691, "receipts": 691, "executions": 691, "health": {"loop_lag_p99": 0.026364316003309796, "launch_lag_p99": 0.025199627999246133, "cpu_seconds": 1.078929718, "loop_sample_count": 5995, "launch_sample_count": 600, "sample_interval": 0.01, "limits": {"loop_lag_p99": 0.035, "launch_lag_p99": 0.05, "frozen": false}}, "lifecycle": {"pid": 62493, "returncode": 0, "reaped": true, "forced_kill": false, "unexpected_exit": false}, "wall_seconds": 60.390157862002525}
+RUN_EXIT {"order":8,"exit_code":0}
+PYTHON <PROJECT_ROOT>/.venv/bin/python
+RUN_BEGIN {"order":9,"scenario":"S3","configuration":"C4","seed":9104}
+COMMAND source scripts/env.sh && PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m outage_test.runner S3 C4 9104
+{"result_file": "<PROJECT_ROOT>/results/pilot/exploratory-S3-C4-1-9472086449d74aef890cbe0a316ee142.json", "sha256": "f9027e1ee6b0a6bb8edeb0491204ce26fdfcd7f87527da65847011488814d18d", "validity": {"status": "VALID", "reasons": []}, "jobs": 600, "attempts": 691, "receipts": 691, "executions": 600, "health": {"loop_lag_p99": 0.025715097999636782, "launch_lag_p99": 0.02640459299728093, "cpu_seconds": 0.9681078409999999, "loop_sample_count": 5998, "launch_sample_count": 600, "sample_interval": 0.01, "limits": {"loop_lag_p99": 0.035, "launch_lag_p99": 0.05, "frozen": false}}, "lifecycle": {"pid": 62722, "returncode": 0, "reaped": true, "forced_kill": false, "unexpected_exit": false}, "wall_seconds": 60.382312514997466}
+RUN_EXIT {"order":9,"exit_code":0}
+BATCH_COMPLETED completed=9
+BATCH_EXIT exit_code=0 tee_exit=0

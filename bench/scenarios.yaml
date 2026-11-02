@@ -1,0 +1,169 @@
+schema_version: 1
+status: PROPOSED
+frozen: false
+provider:
+  host: 127.0.0.1
+  parameters:
+    rate: 10.0
+    bucket_capacity: 10.0
+    outage_start: 20.0
+    outage_end: 35.0
+    loss_fraction: 0.15
+    capacity: 128
+    max_pending: 256
+  seed: slot.workload_seed equals slot.fault_seed
+  scenario: cell.scenario
+  idempotency: true only for S3
+  behavior:
+    service_base_seconds: 0.08
+    service_factor_range:
+    - 0.9
+    - 1.1
+    request_body_max_bytes: 2048
+    normal_deadline_seconds: 12
+    hung_hold_seconds: 6
+    retry_after_seconds: 1
+    admin: Separate loopback app; per-run private credential is never recorded.
+    S0: HEALTHY
+    S1: 'Initially full token bucket; rate=10/s, capacity=10; 429 Retry-After: 1 on rejection. Arrival-timed refill;
+      retries consume shared capacity.'
+    S2: 'Arrival in [20,35): SHA256 draw <0.5 gives ERROR_503, otherwise HUNG. Outside: healthy. Hash includes seed,scenario,job_id,next
+      actual execution ordinal,purpose=fault. HUNG holds capacity six seconds without execution.'
+    S3: 'First actual execution only: seeded draw <0.15 loses reply after execution and caches keyed result. Retried
+      unkeyed job may execute twice; keyed replay is DEDUPED.'
+scenarios:
+  S0:
+    duration_seconds: 60
+    segments:
+    - - 0
+      - 60
+      - 10
+    jobs: 600
+    configurations:
+    - C0
+    - C4
+  S1:
+    duration_seconds: 60
+    segments:
+    - - 0
+      - 20
+      - 6
+    - - 20
+      - 30
+      - 14
+    - - 30
+      - 60
+      - 6
+    jobs: 440
+    configurations:
+    - C0
+    - C1
+    - C2
+    - C3
+    - C4
+  S2:
+    duration_seconds: 60
+    segments:
+    - - 0
+      - 60
+      - 10
+    jobs: 600
+    configurations:
+    - C0
+    - C1
+    - C2
+    - C3
+    - C4
+  S3:
+    duration_seconds: 60
+    segments:
+    - - 0
+      - 60
+      - 10
+    jobs: 600
+    configurations:
+    - C0
+    - C1
+    - C2
+    - C3
+    - C4
+design:
+  valid_runs_per_cell: 3
+  total_cells: 17
+  total_valid_results: 51
+  rounds:
+  - round: 1
+    seed: 12001
+  - round: 2
+    seed: 12002
+  - round: 3
+    seed: 12003
+  excluded_pilot_seeds:
+  - 9001
+  - 9002
+  - 9003
+  - 9101
+  - 9102
+  - 9103
+  - 9104
+  - 9105
+  - 9106
+  order_rng_seed: 72026
+  algorithm: Python random.Random(72026), one RNG reused across rounds; each round starts with scenario-major cells
+    (S0 C0,C4; S1-S3 C0-C4), then rng.shuffle(cells). run_slot equals round. Retries keep slot. Order RNG never
+    enters workload/fault generation.
+  workload: SHA256(JSON([scenario, workload_seed, zero-based job index])) gives job_id; text is synthetic plus space
+    plus job_id; timing is segments. Neither config nor order is an input. Fault seed equals workload seed; shared
+    policy and deterministic draws do not guarantee identical arrival-dependent outcomes.
+order:
+- {config: C2, fault_seed: 12001, ordinal: 1, round: 1, run_slot: 1, scenario: S1, workload_seed: 12001}
+- {config: C1, fault_seed: 12001, ordinal: 2, round: 1, run_slot: 1, scenario: S1, workload_seed: 12001}
+- {config: C4, fault_seed: 12001, ordinal: 3, round: 1, run_slot: 1, scenario: S2, workload_seed: 12001}
+- {config: C2, fault_seed: 12001, ordinal: 4, round: 1, run_slot: 1, scenario: S2, workload_seed: 12001}
+- {config: C4, fault_seed: 12001, ordinal: 5, round: 1, run_slot: 1, scenario: S1, workload_seed: 12001}
+- {config: C0, fault_seed: 12001, ordinal: 6, round: 1, run_slot: 1, scenario: S2, workload_seed: 12001}
+- {config: C3, fault_seed: 12001, ordinal: 7, round: 1, run_slot: 1, scenario: S1, workload_seed: 12001}
+- {config: C3, fault_seed: 12001, ordinal: 8, round: 1, run_slot: 1, scenario: S2, workload_seed: 12001}
+- {config: C4, fault_seed: 12001, ordinal: 9, round: 1, run_slot: 1, scenario: S0, workload_seed: 12001}
+- {config: C1, fault_seed: 12001, ordinal: 10, round: 1, run_slot: 1, scenario: S3, workload_seed: 12001}
+- {config: C0, fault_seed: 12001, ordinal: 11, round: 1, run_slot: 1, scenario: S0, workload_seed: 12001}
+- {config: C0, fault_seed: 12001, ordinal: 12, round: 1, run_slot: 1, scenario: S3, workload_seed: 12001}
+- {config: C0, fault_seed: 12001, ordinal: 13, round: 1, run_slot: 1, scenario: S1, workload_seed: 12001}
+- {config: C1, fault_seed: 12001, ordinal: 14, round: 1, run_slot: 1, scenario: S2, workload_seed: 12001}
+- {config: C3, fault_seed: 12001, ordinal: 15, round: 1, run_slot: 1, scenario: S3, workload_seed: 12001}
+- {config: C4, fault_seed: 12001, ordinal: 16, round: 1, run_slot: 1, scenario: S3, workload_seed: 12001}
+- {config: C2, fault_seed: 12001, ordinal: 17, round: 1, run_slot: 1, scenario: S3, workload_seed: 12001}
+- {config: C4, fault_seed: 12002, ordinal: 18, round: 2, run_slot: 2, scenario: S2, workload_seed: 12002}
+- {config: C0, fault_seed: 12002, ordinal: 19, round: 2, run_slot: 2, scenario: S1, workload_seed: 12002}
+- {config: C0, fault_seed: 12002, ordinal: 20, round: 2, run_slot: 2, scenario: S3, workload_seed: 12002}
+- {config: C3, fault_seed: 12002, ordinal: 21, round: 2, run_slot: 2, scenario: S3, workload_seed: 12002}
+- {config: C1, fault_seed: 12002, ordinal: 22, round: 2, run_slot: 2, scenario: S3, workload_seed: 12002}
+- {config: C1, fault_seed: 12002, ordinal: 23, round: 2, run_slot: 2, scenario: S1, workload_seed: 12002}
+- {config: C0, fault_seed: 12002, ordinal: 24, round: 2, run_slot: 2, scenario: S0, workload_seed: 12002}
+- {config: C1, fault_seed: 12002, ordinal: 25, round: 2, run_slot: 2, scenario: S2, workload_seed: 12002}
+- {config: C2, fault_seed: 12002, ordinal: 26, round: 2, run_slot: 2, scenario: S1, workload_seed: 12002}
+- {config: C0, fault_seed: 12002, ordinal: 27, round: 2, run_slot: 2, scenario: S2, workload_seed: 12002}
+- {config: C3, fault_seed: 12002, ordinal: 28, round: 2, run_slot: 2, scenario: S2, workload_seed: 12002}
+- {config: C3, fault_seed: 12002, ordinal: 29, round: 2, run_slot: 2, scenario: S1, workload_seed: 12002}
+- {config: C4, fault_seed: 12002, ordinal: 30, round: 2, run_slot: 2, scenario: S3, workload_seed: 12002}
+- {config: C4, fault_seed: 12002, ordinal: 31, round: 2, run_slot: 2, scenario: S1, workload_seed: 12002}
+- {config: C2, fault_seed: 12002, ordinal: 32, round: 2, run_slot: 2, scenario: S2, workload_seed: 12002}
+- {config: C2, fault_seed: 12002, ordinal: 33, round: 2, run_slot: 2, scenario: S3, workload_seed: 12002}
+- {config: C4, fault_seed: 12002, ordinal: 34, round: 2, run_slot: 2, scenario: S0, workload_seed: 12002}
+- {config: C4, fault_seed: 12003, ordinal: 35, round: 3, run_slot: 3, scenario: S1, workload_seed: 12003}
+- {config: C2, fault_seed: 12003, ordinal: 36, round: 3, run_slot: 3, scenario: S1, workload_seed: 12003}
+- {config: C0, fault_seed: 12003, ordinal: 37, round: 3, run_slot: 3, scenario: S1, workload_seed: 12003}
+- {config: C4, fault_seed: 12003, ordinal: 38, round: 3, run_slot: 3, scenario: S3, workload_seed: 12003}
+- {config: C1, fault_seed: 12003, ordinal: 39, round: 3, run_slot: 3, scenario: S1, workload_seed: 12003}
+- {config: C3, fault_seed: 12003, ordinal: 40, round: 3, run_slot: 3, scenario: S3, workload_seed: 12003}
+- {config: C0, fault_seed: 12003, ordinal: 41, round: 3, run_slot: 3, scenario: S0, workload_seed: 12003}
+- {config: C3, fault_seed: 12003, ordinal: 42, round: 3, run_slot: 3, scenario: S1, workload_seed: 12003}
+- {config: C4, fault_seed: 12003, ordinal: 43, round: 3, run_slot: 3, scenario: S2, workload_seed: 12003}
+- {config: C4, fault_seed: 12003, ordinal: 44, round: 3, run_slot: 3, scenario: S0, workload_seed: 12003}
+- {config: C3, fault_seed: 12003, ordinal: 45, round: 3, run_slot: 3, scenario: S2, workload_seed: 12003}
+- {config: C2, fault_seed: 12003, ordinal: 46, round: 3, run_slot: 3, scenario: S3, workload_seed: 12003}
+- {config: C0, fault_seed: 12003, ordinal: 47, round: 3, run_slot: 3, scenario: S3, workload_seed: 12003}
+- {config: C0, fault_seed: 12003, ordinal: 48, round: 3, run_slot: 3, scenario: S2, workload_seed: 12003}
+- {config: C2, fault_seed: 12003, ordinal: 49, round: 3, run_slot: 3, scenario: S2, workload_seed: 12003}
+- {config: C1, fault_seed: 12003, ordinal: 50, round: 3, run_slot: 3, scenario: S2, workload_seed: 12003}
+- {config: C1, fault_seed: 12003, ordinal: 51, round: 3, run_slot: 3, scenario: S3, workload_seed: 12003}
