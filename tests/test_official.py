@@ -220,20 +220,78 @@ def test_full_order_invalid_preservation_and_completed_resume(registered, tmp_pa
     assert snapshots == {p.relative_to(directory): p.read_bytes() for p in directory.rglob('*.json')}
 
 
-def test_three_attempt_cap_across_restart(registered, tmp_path):
-    first = document(registered, attempt=1, complete=False)
-    with official.official_root(tmp_path) as fd: saved = save(fd,first)
+@pytest.mark.parametrize('ordinal', [1,3])
+def test_three_attempt_cap_across_restart(registered, tmp_path, ordinal):
+    slot = registered['scenarios']['order'][ordinal-1]
+    first = document(registered, slot, attempt=1, complete=False)
+    with official.official_root(tmp_path) as fd:
+        for earlier in registered['scenarios']['order'][:ordinal-1]:
+            save(fd,document(registered,earlier))
+        saved = save(fd,first)
     original = (tmp_path / 'results/official' / saved).read_bytes()
+    directory = tmp_path / 'results/official'
+    earlier_bytes = {p: p.read_bytes() for p in directory.rglob('*.json')}
     calls = []
     async def invalid(slot, attempt, reg, who):
         calls.append((deepcopy(slot),attempt))
         return document(reg,slot,attempt,complete=False)
     result = asyncio.run(official.execute(registered,tmp_path,invalid))
-    assert result == dict(status="INCOMPLETE",valid_slots=0,official_runs_executed=152)
-    assert [a for s,a in calls if s['ordinal'] == 1] == [2,3]
+    assert result == dict(status="INCOMPLETE",valid_slots=ordinal-1,official_runs_executed=2)
+    assert [a for s,a in calls if s['ordinal'] == ordinal] == [2,3]
+    assert all(s == slot for s,a in calls)
     assert all(s == registered['scenarios']['order'][s['ordinal']-1] for s,a in calls)
-    assert asyncio.run(official.execute(registered,tmp_path,invalid))['official_runs_executed'] == 0
+    manifests = list(directory.glob('manifest-*.json'))
+    assert len(manifests) == 1
+    manifest = json.loads(manifests[0].read_bytes())
+    assert manifest['status'] == 'INCOMPLETE' and len(manifest['slots']) == 51
+    assert all(row['status'] == 'VALID' for row in manifest['slots'][:ordinal-1])
+    exhausted = manifest['slots'][ordinal-1]
+    assert exhausted['status'] == 'INCOMPLETE'
+    assert [a['attempt'] for a in exhausted['attempts']] == [1,2,3]
+    assert all(a['status'] == 'INVALID' for a in exhausted['attempts'])
+    assert all(not row['attempts'] for row in manifest['slots'][ordinal:])  # Later slots NOT RUN.
+    for row in manifest['slots']:
+        for attempt in row['attempts']:
+            assert official.digest((directory / attempt['path']).read_bytes()) == attempt['sha256']
+    snapshots = {p: p.read_bytes() for p in directory.rglob('*.json')}
+    forbidden = AsyncMock(side_effect=AssertionError('exhausted batch must stay blocked'))
+    assert asyncio.run(official.execute(registered,tmp_path,forbidden)) == dict(
+        status='INCOMPLETE',valid_slots=ordinal-1,official_runs_executed=0)
+    forbidden.assert_not_awaited()
+    assert snapshots == {p: p.read_bytes() for p in directory.rglob('*.json')}
+    assert all(p.read_bytes() == raw for p,raw in earlier_bytes.items())
     assert original == (tmp_path / 'results/official' / saved).read_bytes()
+
+
+def test_first_slot_exhausted_from_empty_batch(registered, tmp_path):
+    calls = []
+    async def invalid(slot, attempt, reg, who):
+        calls.append((deepcopy(slot),attempt))
+        return document(reg,slot,attempt,complete=False)
+    assert asyncio.run(official.execute(registered,tmp_path,invalid)) == dict(
+        status='INCOMPLETE',valid_slots=0,official_runs_executed=3)
+    assert calls == [(registered['scenarios']['order'][0],n) for n in (1,2,3)]
+
+
+def test_resume_rejects_attempts_after_exhaustion(registered, tmp_path):
+    order = registered['scenarios']['order']
+    with official.official_root(tmp_path) as fd:
+        for attempt in (1,2,3): save(fd,document(registered,order[0],attempt,complete=False))
+        save(fd,document(registered,order[1],complete=False))
+    forbidden = AsyncMock()
+    with pytest.raises(ValueError,match='registered order'):
+        asyncio.run(official.execute(registered,tmp_path,forbidden))
+    forbidden.assert_not_awaited()
+
+
+def test_incomplete_result_has_nonzero_exit(registered, monkeypatch, capsys):
+    monkeypatch.setattr(official.argparse.ArgumentParser,'parse_args',lambda self,argv:SimpleNamespace(preflight=False))
+    monkeypatch.setattr(official,'preflight',lambda:registered)
+    execution = AsyncMock(return_value=dict(status='INCOMPLETE',valid_slots=0,official_runs_executed=3))
+    monkeypatch.setattr(official,'execute',execution)
+    assert official.main([]) == 2
+    execution.assert_awaited_once_with(registered)
+    assert json.loads(capsys.readouterr().out)['status'] == 'INCOMPLETE'
 
 
 @pytest.mark.parametrize("damage", ['bytes','decision','after_valid','gap','out_of_order','manifest'])

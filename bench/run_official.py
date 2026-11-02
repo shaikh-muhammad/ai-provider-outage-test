@@ -375,7 +375,7 @@ def discover(fd, registration, who):
         require(len(values) <= 3 and [v["attempt"] for v in values] == list(range(1, len(values)+1)), "ambiguous attempt sequence")
         require(all(v["status"] == "INVALID" for v in values[:-1]), "attempt after VALID")
         require(not blocked or not values, "resume violates registered order")
-        blocked |= not values or (len(values) < 3 and values[-1]["status"] == "INVALID")
+        blocked |= not values or values[-1]["status"] == "INVALID"
     for previous in manifests:
         require(type(previous) is dict and type(previous.get("slots")) is list and len(previous["slots"]) == 51)
         subset = {}
@@ -407,6 +407,8 @@ async def execute(registration, root=ROOT, capture=None):
                         require(doc["validity"] == assess(doc, registration, who))
                         sha = finish(output, directory, doc)
                     values.append(dict(path=path, sha256=sha, status=doc["validity"]["status"], attempt=doc["attempt"]))
+                if values[-1]["status"] != "VALID":
+                    break
         reread, _ = discover(fd, registration, who)
         require(reread == attempts, "official files changed during execution")
         final = manifest(attempts, registration, who)
