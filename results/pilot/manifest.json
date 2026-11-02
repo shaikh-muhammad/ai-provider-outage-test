@@ -1,0 +1,56 @@
+{
+  "artifacts": [
+    {
+      "configuration": "C0",
+      "kind": "smoke",
+      "name": "exploratory-S0-C0-1-0480e9f4abc84937842b95d12da479d3.json",
+      "original_status": "INVALID",
+      "scenario": "S0",
+      "seed": 9002,
+      "sha256": "9f88a06840e86787662302353fbd051e2fe983f51532acb3516a6ca1ef84697f",
+      "size_bytes": 973480
+    },
+    {
+      "configuration": "C0",
+      "kind": "smoke",
+      "name": "exploratory-S0-C0-1-10cb863235eb4a3fbe72b4f422598830.json",
+      "original_status": "VALID",
+      "scenario": "S0",
+      "seed": 9003,
+      "sha256": "c6bb417d0341ee0cb1c4c6446fb894885bf2b91d7fb0523e17011083375db0f2",
+      "size_bytes": 973821
+    },
+    {
+      "configuration": "C0",
+      "kind": "smoke",
+      "name": "exploratory-S0-C0-1-9cce03d3509f47348dbb50835a725274.json",
+      "original_status": "INVALID",
+      "scenario": "S0",
+      "seed": 9001,
+      "sha256": "5a93b627bad33ed04ac260817a42a0411ae62ab0fa8b9f9ea9e36b78013a1b44",
+      "size_bytes": 925118
+    },
+    {
+      "kind": "selection",
+      "name": "exploratory-pilot-v2-calibration-940b5ecc11294745935d626b3405ce02.json",
+      "sha256": "c5e02ca40311bd65319f721969b44a5bb60ec0ab3ba75a5e2e69c50598f894ec",
+      "size_bytes": 217447
+    },
+    {
+      "kind": "held-out",
+      "name": "exploratory-pilot-v2-heldout-89d2b85402874a5abc7069678cfc3ff3.json",
+      "sha256": "7f8e89ceddcb308d94f37399279f92995b29c792bb8df3174cf67147c2e69cb6",
+      "size_bytes": 72222
+    },
+    {
+      "kind": "predeclaration",
+      "name": "exploratory-pilot-v2-rule-f8abeb01b79d48b58380e058c6d55220.json",
+      "sha256": "fcf9436735e4cc5d836d526d40438204a7c32b5473dac092414993f43f3bb54d",
+      "size_bytes": 1973
+    }
+  ],
+  "exploratory": true,
+  "official_threshold": null,
+  "registered": false,
+  "schema_version": 1
+}
