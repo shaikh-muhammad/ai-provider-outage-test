@@ -1,4 +1,4 @@
-"""Offline checks of a proposal, never permission to run official experiments."""
+"""Offline frozen-registration checks; the lock does not authorize experiments."""
 import asyncio
 from collections import Counter
 from copy import deepcopy
@@ -42,8 +42,21 @@ RECOVERY = dict(outage_end_seconds=35, window_seconds=5, observation_times_secon
 ACTIVATION = ["Both YAML documents must consistently state status=FROZEN and frozen=true with the owner-approved values.", "Tests must enforce the approved frozen state in both YAML documents.",
     "Record owner approval provenance and approved registration/source checksums.", "CI must succeed against the final exact PR head before merge.",
     "Never merge status=PROPOSED or frozen=false; merge the approved frozen files to main before any official run.", "Do not edit the frozen files after that merge."]
-T_SCHEMA = dict(schema_version=1, status="PROPOSED", frozen=False,
-    metadata=dict(approval=str, activation_requirements=[str], source_head=str, brief=str, proposed_source_sha256={n: str for n in SOURCE_NAMES},
+APPROVAL = dict(date="2026-11-02", provenance="Owner approval communicated in the ChatGPT conversation on 2026-11-02.", authentication="Not cryptographically signed or independently authenticated.")
+FREEZE = dict(experiment_id="project3-g7-2026-11-02", approval=APPROVAL, execution="P16-FREEZE execution #23",
+    reviewed_commit="19d705246fbb5bb2a41117b7cbf95abc24624207", notice="Freeze metadata supersedes preserved historical proposal wording; official runs require a separate reviewed P17 prompt.")
+YAML_NAMES = ["bench/thresholds.yaml", "bench/scenarios.yaml"]
+IMPLEMENTATION = SOURCE_NAMES[:5]
+SNAPSHOTS = dict(zip(YAML_NAMES, ["15c7f50bc9ed2f26887774ba18d6f45811964a9742712a64c2c09aedb3d1a4b1", "2c0508661d2be5af9cd339970af616f2340caad4e0d537dc27c8b8860bd080a5"]))
+LOCK_SCHEMA = dict(schema_version=1, status="FROZEN", experiment_id=FREEZE["experiment_id"], approval=APPROVAL,
+    reviewed_commit=FREEZE["reviewed_commit"], freeze_execution=FREEZE["execution"], yaml_sha256={n: str for n in YAML_NAMES},
+    approved_semantic_sha256=SNAPSHOTS, order_sha256="54ae742d46d08424bcbc76592aa88a91bd271541433167d9ce67fc05f385855d",
+    order_encoding="UTF-8 JSON; sorted keys; compact comma/colon separators; ensure_ascii=true; allow_nan=false; no trailing newline",
+    implementation_sha256={n: str for n in IMPLEMENTATION}, health_limits=dict(sample_interval_seconds=.01, loop_lag_p99_seconds=.035, launch_lag_p99_seconds=.05),
+    total_cells=17, total_planned_slots=51, official_runs_authorized=False,
+    authorization_note="The registration lock itself does not authorize official runs; a separate reviewed P17 prompt is required.")
+T_SCHEMA = dict(schema_version=1, status="FROZEN", frozen=True,
+    metadata=dict(freeze=FREEZE, approval="Owner approval communicated in ChatGPT on 2026-11-02; freeze metadata governs. Official runs are not authorized.", activation_requirements=[str], source_head=str, brief=str, proposed_source_sha256={n: str for n in SOURCE_NAMES},
                   publication=PUB, limitations=[str]), clients={f"C{i}": POLICY for i in range(5)},
     client_semantics=dict(retryable_http=[(int, str)], retryable_failures=[str], terminal=[str],
         backoff=dict(base_seconds=float, cap_seconds=float, policy=str), retry_after=str, deadline=str,
@@ -64,7 +77,7 @@ T_SCHEMA = dict(schema_version=1, status="PROPOSED", frozen=False,
     implementation_dependencies=dict(P17=[str], P19=[str]))
 PARAMS = dict(rate=10.0, bucket_capacity=10.0, outage_start=20.0, outage_end=35.0,
               loss_fraction=0.15, capacity=128, max_pending=256)
-S_SCHEMA = dict(schema_version=1, status="PROPOSED", frozen=False,
+S_SCHEMA = dict(schema_version=1, status="FROZEN", frozen=True, metadata=dict(freeze=FREEZE),
     provider=dict(host="127.0.0.1", parameters=PARAMS, seed=str, scenario=str, idempotency=str,
         behavior=dict(service_base_seconds=0.08, service_factor_range=[float], request_body_max_bytes=2048,
             normal_deadline_seconds=12, hung_hold_seconds=6, retry_after_seconds=1, admin=str,
@@ -94,6 +107,44 @@ def shape(value, spec):
 
 def documents():
     return [yaml.safe_load((ROOT / "bench" / name).read_bytes()) for name in ("thresholds.yaml", "scenarios.yaml")]
+
+
+def canonical(value):
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False).encode()
+
+
+def unique_object(pairs):
+    assert len(dict(pairs)) == len(pairs), "duplicate JSON field"
+    return dict(pairs)
+
+
+def verify_freeze(directory=ROOT):
+    names = YAML_NAMES + ["bench/registration.lock.json"] + IMPLEMENTATION
+    raw = {n: (directory / n).read_bytes() for n in names}
+    assert all(len(v) <= 128 * 1024 for v in raw.values())
+    assert all(not (directory / n).is_symlink() for n in names)
+    t, s = [yaml.safe_load(raw[n]) for n in YAML_NAMES]
+    lock = json.loads(raw["bench/registration.lock.json"], object_pairs_hook=unique_object)
+    canonical([t, s, lock])  # Reject nonfinite data anywhere, including otherwise unused notes.
+    validate(t, s)
+    shape(lock, LOCK_SCHEMA)
+    for group in ("yaml_sha256", "implementation_sha256"):
+        for name, digest in lock[group].items():
+            assert re.fullmatch(r"[a-f0-9]{64}", digest)
+            assert hashlib.sha256(raw[name]).hexdigest() == digest
+    assert lock["implementation_sha256"] == {n: t["metadata"]["proposed_source_sha256"][n] for n in IMPLEMENTATION}
+    assert hashlib.sha256(canonical(s["order"])).hexdigest() == lock["order_sha256"]
+    for name, document in zip(YAML_NAMES, (t, s), strict=True):
+        semantic = deepcopy(document)
+        del semantic["status"], semantic["frozen"], semantic["metadata"]["freeze"]
+        if name == YAML_NAMES[0]:
+            del semantic["metadata"]["approval"]
+        if not semantic["metadata"]:
+            del semantic["metadata"]
+        assert hashlib.sha256(canonical(semantic)).hexdigest() == lock["approved_semantic_sha256"][name]
+    assert lock["health_limits"] == {k: t["validity"][k] for k in lock["health_limits"]}
+    assert lock["total_planned_slots"] == len(s["order"]) == 51 and s["design"]["total_cells"] == 17
+    return lock
 
 
 def validate(t, s):
@@ -284,6 +335,52 @@ def test_missing_recovery_and_five_second_guardrail(baseline, candidate, expecte
     actual = ("INCONCLUSIVE" if baseline is None else "HARMFUL" if candidate is None or candidate > baseline+5 else "PASS")
     assert actual == expected
 
+
+def test_final_frozen_registration():
+    assert verify_freeze()["status"] == "FROZEN"
+
+
+@pytest.mark.parametrize("change", ["unknown_lock", "missing_lock", "approval", "lock_proposed", "yaml_hash",
+    "source_hash", "order_hash", "yaml_bytes", "code_bytes", "metadata_unknown", "metadata_missing",
+    "metadata_corrupt", "proposed", "partial", "health", "slots", "nonfinite", "duplicate_key", "run_authorized"])
+def test_freeze_corruption_in_temporary_files(tmp_path, change):
+    for name in YAML_NAMES + ["bench/registration.lock.json"] + IMPLEMENTATION:
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes((ROOT / name).read_bytes())
+    lock_path = tmp_path / "bench/registration.lock.json"
+    lock = json.loads(lock_path.read_bytes())
+    if change == "unknown_lock": lock["unknown"] = True
+    elif change == "missing_lock": del lock["approval"]
+    elif change == "approval": lock["approval"]["date"] = "2026-11-03"
+    elif change == "lock_proposed": lock["status"] = "PROPOSED"
+    elif change == "yaml_hash": lock["yaml_sha256"][YAML_NAMES[0]] = "0"*64
+    elif change == "source_hash": lock["implementation_sha256"][IMPLEMENTATION[0]] = "0"*64
+    elif change == "order_hash": lock["order_sha256"] = "0"*64
+    elif change in ("yaml_bytes", "code_bytes"):
+        path = tmp_path / (YAML_NAMES[0] if change == "yaml_bytes" else IMPLEMENTATION[0])
+        path.write_bytes(path.read_bytes()+b"\n")
+    elif change == "health": lock["health_limits"]["loop_lag_p99_seconds"] = .036
+    elif change == "slots": lock["total_planned_slots"] = 50
+    elif change == "nonfinite": lock["health_limits"]["launch_lag_p99_seconds"] = float("nan")
+    elif change == "run_authorized": lock["official_runs_authorized"] = True
+    elif change != "duplicate_key":
+        for name in YAML_NAMES:
+            path = tmp_path / name
+            data = yaml.safe_load(path.read_bytes())
+            if change == "metadata_unknown": data["metadata"]["freeze"]["unknown"] = True
+            elif change == "metadata_missing": del data["metadata"]["freeze"]["approval"]
+            elif change == "metadata_corrupt": data["metadata"]["freeze"]["approval"]["date"] = "2026-11-03"
+            elif change == "proposed": data.update(status="PROPOSED", frozen=False)
+            elif name == YAML_NAMES[1]: data["frozen"] = False
+            path.write_text(yaml.safe_dump(data))
+            lock["yaml_sha256"][name] = hashlib.sha256(path.read_bytes()).hexdigest()
+    raw = json.dumps(lock).encode()
+    lock_path.write_bytes(b'{"status":"FROZEN",'+raw[1:] if change == "duplicate_key" else raw)
+    with pytest.raises((AssertionError, ValueError)):
+        verify_freeze(tmp_path)
+
+
 def test_public_evidence_and_source_hashes():
     t, _ = documents()
     pub = t["metadata"]["publication"]
@@ -301,7 +398,7 @@ def test_public_evidence_and_source_hashes():
     ends = [json.loads(l[9:]) for l in lines if l.startswith("RUN_EXIT ")]
     receipts = [json.loads(l) for l in lines if l.startswith("{")]
     assert len(begins) == len(ends) == len(receipts) == len(plan["runs"]) == len(summary["runs"]) == 9
-    candidates = [ROOT / "bench/thresholds.yaml", ROOT / "bench/scenarios.yaml", Path(__file__), PILOT / "exploratory-g6-plan-public.json", PILOT / "exploratory-g6-batch-public.txt", PILOT / "exploratory-g6-summary-8c58d7960a9e4824a0a7421a9fa2038e.json"]
+    candidates = [ROOT / "bench/thresholds.yaml", ROOT / "bench/scenarios.yaml", ROOT / "bench/registration.lock.json", Path(__file__), PILOT / "exploratory-g6-plan-public.json", PILOT / "exploratory-g6-batch-public.txt", PILOT / "exploratory-g6-summary-8c58d7960a9e4824a0a7421a9fa2038e.json"]
     for p, r, begin, end, receipt in zip(plan["runs"], summary["runs"], begins, ends, receipts, strict=True):
         assert all(p[k] == r[k] for k in ("order", "scenario", "configuration", "seed", "command", "workload_sha256"))
         assert begin == {k: p[k] for k in ("order", "scenario", "configuration", "seed")} and end == dict(order=p["order"], exit_code=0)
@@ -315,6 +412,6 @@ def test_public_evidence_and_source_hashes():
         assert harness.validate_run(data["run"], data["ledger"], data["metadata"]) == {"status": "VALID", "reasons": []}
         candidates.append(path)
     assert lines[-2:] == ["BATCH_COMPLETED completed=9", "BATCH_EXIT exit_code=0 tee_exit=0"]
-    assert len(candidates) == 15 and all(not re.search(rb"/(?:home|Users)/[^/\s]+/", p.read_bytes()) for p in candidates)
+    assert len(candidates) == 16 and all(not re.search(rb"/(?:home|Users)/[^/\s]+/", p.read_bytes()) for p in candidates)
     for name, digest in t["metadata"]["proposed_source_sha256"].items():
         assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest

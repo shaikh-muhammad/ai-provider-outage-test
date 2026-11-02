@@ -1,6 +1,17 @@
 schema_version: 1
-status: PROPOSED
-frozen: false
+status: FROZEN
+frozen: true
+metadata:
+  freeze:
+    experiment_id: project3-g7-2026-11-02
+    approval:
+      date: '2026-11-02'
+      provenance: Owner approval communicated in the ChatGPT conversation on 2026-11-02.
+      authentication: Not cryptographically signed or independently authenticated.
+    execution: 'P16-FREEZE execution #23'
+    reviewed_commit: 19d705246fbb5bb2a41117b7cbf95abc24624207
+    notice: Freeze metadata supersedes preserved historical proposal wording; official runs require a separate reviewed
+      P17 prompt.
 provider:
   host: 127.0.0.1
   parameters:

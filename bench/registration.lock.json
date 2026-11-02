@@ -1,0 +1,38 @@
+{
+  "approval": {
+    "authentication": "Not cryptographically signed or independently authenticated.",
+    "date": "2026-11-02",
+    "provenance": "Owner approval communicated in the ChatGPT conversation on 2026-11-02."
+  },
+  "approved_semantic_sha256": {
+    "bench/scenarios.yaml": "2c0508661d2be5af9cd339970af616f2340caad4e0d537dc27c8b8860bd080a5",
+    "bench/thresholds.yaml": "15c7f50bc9ed2f26887774ba18d6f45811964a9742712a64c2c09aedb3d1a4b1"
+  },
+  "authorization_note": "The registration lock itself does not authorize official runs; a separate reviewed P17 prompt is required.",
+  "experiment_id": "project3-g7-2026-11-02",
+  "freeze_execution": "P16-FREEZE execution #23",
+  "health_limits": {
+    "launch_lag_p99_seconds": 0.05,
+    "loop_lag_p99_seconds": 0.035,
+    "sample_interval_seconds": 0.01
+  },
+  "implementation_sha256": {
+    "src/outage_test/client.py": "18b5438073d8b9b226df15f38f1213b31936c37b4f3c2bd2448ab8259a24eb31",
+    "src/outage_test/faults.py": "e417c17583b66af14a718edd922eb7879d5b0d574588c66637be75534f39f903",
+    "src/outage_test/harness.py": "9943eaf3a8e777f06f48ed43cb79be5e64b3551061b3c2985ae6f754e1517f88",
+    "src/outage_test/provider.py": "c64545af9bf2c604f9324f8118fb8c6c23cea230ce1a058645c6c89f1586a9f9",
+    "src/outage_test/runner.py": "a92f1253c90e42893e17d59fcc846a5bfd6d6970a623492793aa650d0324c59d"
+  },
+  "official_runs_authorized": false,
+  "order_encoding": "UTF-8 JSON; sorted keys; compact comma/colon separators; ensure_ascii=true; allow_nan=false; no trailing newline",
+  "order_sha256": "54ae742d46d08424bcbc76592aa88a91bd271541433167d9ce67fc05f385855d",
+  "reviewed_commit": "19d705246fbb5bb2a41117b7cbf95abc24624207",
+  "schema_version": 1,
+  "status": "FROZEN",
+  "total_cells": 17,
+  "total_planned_slots": 51,
+  "yaml_sha256": {
+    "bench/scenarios.yaml": "58a433d2100414442478c1482a156edbd060bacfa593a81ca8265e7ca87770f2",
+    "bench/thresholds.yaml": "8743100fb984920969da9bf48d4028b453c949ec3f4c5ea3981b71aad789a1c7"
+  }
+}
