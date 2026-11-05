@@ -449,3 +449,196 @@ def test_capture_cleanup_and_private_data(registered, monkeypatch, failure):
         assert captured['validity']['status'] == ('INVALID' if failure else 'VALID')
         assert b'synthetic-admin-value' not in official.encoded(captured)
     stop.assert_awaited_once()
+
+
+@pytest.fixture(scope='module')
+def recovery_prefix():
+    reg = official.preflight(ancestry=lambda commit: commit == official.FREEZE_COMMIT)
+    return [official.encoded(document(reg, slot)) for slot in reg['scenarios']['order'][:29]]
+
+
+@pytest.fixture
+def recovery_batch(registered, tmp_path, monkeypatch, recovery_prefix):
+    directory = tmp_path / 'results/official'
+    prefix = []
+    for slot, raw in zip(registered['scenarios']['order'][:29], recovery_prefix, strict=True):
+        path = f"{slot['scenario']}/{slot['config']}/run-{slot['run_slot']}-{official.uuid.uuid4().hex}.json"
+        target = directory / path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with target.open('xb') as stream: stream.write(raw)
+        prefix.append([dict(path=path, sha256=official.digest(raw), status='VALID', attempt=1)])
+    (directory / official.RECOVERY_PATH).touch(exist_ok=False)
+    who = dict(version=1, sha256='e'*64, git_commit='b'*40)
+    monkeypatch.setattr(official, 'ORIGINAL_RUNNER', deepcopy(WHO))
+    monkeypatch.setattr(official, 'RECOVERY_PREFIX_SHA', official.digest(official.encoded(prefix)))
+    monkeypatch.setattr(official, 'identity', lambda root: deepcopy(who))
+    originals = {p: p.read_bytes() for p in directory.rglob('*.json')}
+    return directory, who, originals
+
+
+def recovered_document(reg, slot, attempt, who, complete=True):
+    doc = document(reg, slot, attempt, complete)
+    doc['runner'] = deepcopy(who)
+    doc['environment']['git_commit'] = who['git_commit']
+    doc['metadata']['health']['context']['environment'] = deepcopy(doc['environment'])
+    doc['validity'] = official.assess(doc, reg, who)
+    return doc
+
+
+def test_recovery_scope_is_exact():
+    assert official.RECOVERY_PATH == 'S3/C4/run-2-64520e2f05e143dc816e7961285adf0b.json'
+    assert official.RECOVERY_FILE == 'recovery-20261105-slot30.json'
+    assert official.ORIGINAL_RUNNER == dict(version=1, git_commit='f2260d1d6d179fd1f1913d3ff87d1867c48cf571',
+        sha256='c64fa8b158a783209d75972122edc628b95dca4ea5d6795b786832e52f619036')
+    assert official.RECOVERY_PREFIX_SHA == 'a36780d71956ea49aaef87fe0d8785126cc15ca2304ef143c5b708dbbdba0b66'
+
+
+@pytest.mark.parametrize('failures', [0, 1, 2])
+def test_recovery_counts_caps_order_disclosure_and_repeat(registered, tmp_path, recovery_batch, failures):
+    directory, who, originals = recovery_batch
+    assert official.record_recovery(registered, tmp_path) == dict(status='RECOVERY_RECORDED',
+        recovery_record=official.RECOVERY_FILE, abandoned_attempts=1, official_runs_executed=0)
+    sidecar = directory / official.RECOVERY_FILE
+    record_bytes = sidecar.read_bytes()
+    official.record_recovery(registered, tmp_path)
+    assert sidecar.read_bytes() == record_bytes
+    calls = []
+    async def capture(slot, attempt, reg, identity):
+        calls.append((deepcopy(slot), attempt))
+        return recovered_document(reg, slot, attempt, identity, not(slot['ordinal'] == 30 and attempt <= failures+1))
+    result = asyncio.run(official.execute(registered, tmp_path, capture))
+    order = registered['scenarios']['order']
+    assert calls == [(order[29], a) for a in ([2] if failures == 0 else [2,3])] + [(s,1) for s in order[30:]]
+    assert result == dict(status='INCOMPLETE' if failures == 2 else 'COMPLETE', valid_slots=50 if failures == 2 else 51,
+        incomplete_slots=[order[29]] if failures == 2 else [], official_runs_executed=len(calls),
+        abandoned_attempts=1, recovery_record=official.RECOVERY_FILE)
+    manifest = json.loads(next(directory.glob('manifest-*.json')).read_bytes())
+    attempts = manifest['slots'][29]['attempts']
+    assert [a['attempt'] for a in attempts] == ([1,2] if failures == 0 else [1,2,3])
+    assert [a['status'] for a in attempts] == (['ABANDONED','VALID'] if failures == 0 else
+        ['ABANDONED','INVALID','VALID'] if failures == 1 else ['ABANDONED','INVALID','INVALID'])
+    assert attempts[0]['path'] == official.RECOVERY_PATH and attempts[0]['sha256'] == official.digest(b'')
+    assert attempts[0]['recovery'] == dict(path=official.RECOVERY_FILE, sha256=official.digest(record_bytes), record=json.loads(record_bytes))
+    assert manifest['runner'] == who and manifest['slots'][29]['status'] == ('INCOMPLETE' if failures == 2 else 'VALID')
+    assert all(p.read_bytes() == raw for p, raw in originals.items()) and sidecar.read_bytes() == record_bytes
+    snapshot = {p: p.read_bytes() for p in directory.rglob('*.json')}
+    forbidden = AsyncMock(side_effect=AssertionError('completed or exhausted slot rerun'))
+    assert asyncio.run(official.execute(registered, tmp_path, forbidden)) == result | dict(official_runs_executed=0)
+    forbidden.assert_not_called()
+    assert snapshot == {p: p.read_bytes() for p in directory.rglob('*.json')}
+
+
+def test_recovery_attempt_three_across_resume(registered, tmp_path, recovery_batch):
+    directory, who, originals = recovery_batch
+    official.record_recovery(registered, tmp_path)
+    order = registered['scenarios']['order']
+    with official.official_root(tmp_path) as fd:
+        save(fd, recovered_document(registered, order[29], 2, who, complete=False))
+    calls = []
+    async def capture(slot, attempt, reg, identity):
+        calls.append((deepcopy(slot), attempt))
+        return recovered_document(reg, slot, attempt, identity)
+    assert asyncio.run(official.execute(registered, tmp_path, capture))['status'] == 'COMPLETE'
+    assert calls == [(order[29],3)] + [(s,1) for s in order[30:]]
+    assert all(p.read_bytes() == raw for p, raw in originals.items())
+
+
+@pytest.mark.parametrize('damage', ['missing_record', 'empty_record', 'partial_record', 'unknown_field', 'hash', 'runner',
+    'slot', 'seed', 'prefix', 'prefix_bytes', 'record_bytes', 'reservation', 'missing_reservation', 'other_empty',
+    'duplicate_record', 'record_symlink', 'record_hardlink', 'gap', 'order', 'duplicate_valid'])
+def test_recovery_corruption_blocks_before_capture(registered, tmp_path, recovery_batch, damage):
+    directory, who, _ = recovery_batch
+    sidecar = directory / official.RECOVERY_FILE
+    if damage != 'missing_record': sidecar.write_bytes(official.encoded(official.recovery_record(registered, who)))
+    if damage in ('empty_record', 'partial_record'): sidecar.write_bytes(b'' if damage == 'empty_record' else b'{')
+    elif damage in ('unknown_field', 'hash', 'runner', 'slot', 'seed'):
+        data = json.loads(sidecar.read_bytes())
+        if damage == 'unknown_field': data['unknown'] = True
+        elif damage == 'hash': data['sha256'] = '0'*64
+        elif damage == 'runner': data['original_runner']['sha256'] = '0'*64
+        elif damage == 'slot': data['slot']['ordinal'] = 29
+        else: data['slot']['workload_seed'] = 12003
+        sidecar.write_bytes(official.encoded(data))
+    elif damage == 'prefix': next(p for p in directory.rglob('run-*.json') if p.stat().st_size).write_bytes(b'{}')
+    elif damage == 'prefix_bytes':
+        path = next(p for p in directory.rglob('run-*.json') if p.stat().st_size)
+        path.write_bytes(path.read_bytes() + b'\n')
+    elif damage == 'record_bytes': sidecar.write_bytes(sidecar.read_bytes() + b'\n')
+    elif damage == 'reservation': (directory / official.RECOVERY_PATH).write_bytes(b'{}')
+    elif damage == 'missing_reservation': (directory / official.RECOVERY_PATH).unlink()
+    elif damage == 'other_empty': (directory / 'S3/C4/run-2-ffffffffffffffffffffffffffffffff.json').touch()
+    elif damage == 'duplicate_record': (directory / 'recovery-duplicate.json').write_bytes(sidecar.read_bytes())
+    elif damage in ('record_symlink', 'record_hardlink'):
+        target = tmp_path / 'sidecar-target.json'
+        target.write_bytes(sidecar.read_bytes())
+        sidecar.unlink()
+        if damage == 'record_symlink': sidecar.symlink_to(target)
+        else: official.os.link(target, sidecar)
+    elif damage in ('gap', 'order', 'duplicate_valid'):
+        order = registered['scenarios']['order']
+        with official.official_root(tmp_path) as fd:
+            if damage == 'gap': save(fd, recovered_document(registered, order[29], 3, who))
+            elif damage == 'order': save(fd, recovered_document(registered, order[30], 1, who))
+            else:
+                save(fd, recovered_document(registered, order[29], 2, who))
+                save(fd, recovered_document(registered, order[29], 3, who))
+    snapshot = {p: p.read_bytes() for p in directory.rglob('*.json')}
+    forbidden = AsyncMock(side_effect=AssertionError('corruption must block before capture'))
+    with pytest.raises((ValueError, KeyError, OSError)): asyncio.run(official.execute(registered, tmp_path, forbidden))
+    forbidden.assert_not_called()
+    assert snapshot == {p: p.read_bytes() for p in directory.rglob('*.json')}
+
+
+@pytest.mark.parametrize('damage', ['prefix_bytes', 'wrong_reservation', 'later_attempt', 'manifest'])
+def test_recovery_preparation_requires_original_inventory(registered, tmp_path, recovery_batch, damage):
+    directory, who, _ = recovery_batch
+    if damage == 'prefix_bytes':
+        path = next(p for p in directory.rglob('run-*.json') if p.stat().st_size)
+        path.write_bytes(path.read_bytes() + b'\n')
+    elif damage == 'wrong_reservation':
+        (directory / official.RECOVERY_PATH).rename(directory / 'S3/C4/run-2-ffffffffffffffffffffffffffffffff.json')
+    elif damage == 'later_attempt':
+        with official.official_root(tmp_path) as fd:
+            save(fd, recovered_document(registered, registered['scenarios']['order'][29], 2, who))
+    else:
+        with official.official_root(tmp_path) as fd:
+            attempts, _ = official.discover(fd, registered, who, preparing=True)
+        (directory / ('manifest-' + 'f'*32 + '.json')).write_bytes(official.encoded(official.manifest(attempts, registered, who)))
+    snapshot = {p: p.read_bytes() for p in directory.rglob('*.json')}
+    with pytest.raises((ValueError, KeyError, OSError)): official.record_recovery(registered, tmp_path)
+    assert not (directory / official.RECOVERY_FILE).exists()
+    assert snapshot == {p: p.read_bytes() for p in directory.rglob('*.json')}
+
+
+def test_recovery_record_cli_never_captures(registered, tmp_path, recovery_batch, monkeypatch, capsys):
+    prepare = official.record_recovery
+    monkeypatch.setattr(official, 'preflight', lambda: registered)
+    monkeypatch.setattr(official, 'record_recovery', lambda reg: prepare(reg, tmp_path))
+    forbidden = Mock(side_effect=AssertionError('capture forbidden in recovery recording mode'))
+    monkeypatch.setattr(official, 'execute', forbidden)
+    assert official.main(['--record-recovery']) == 0
+    assert json.loads(capsys.readouterr().out)['official_runs_executed'] == 0
+    forbidden.assert_not_called()
+
+
+@pytest.mark.parametrize('stage', ['empty', 'partial', 'complete'])
+def test_recovery_record_creation_interruption(registered, tmp_path, recovery_batch, monkeypatch, stage):
+    directory, _, originals = recovery_batch
+    finish = official.finish
+    def interrupted(fd, parent, value):
+        if stage == 'partial': official.os.write(fd, b'{')
+        if stage == 'complete': finish(fd, parent, value)
+        raise RuntimeError('synthetic interruption')
+    monkeypatch.setattr(official, 'finish', interrupted)
+    with pytest.raises(RuntimeError): official.record_recovery(registered, tmp_path)
+    monkeypatch.setattr(official, 'finish', finish)
+    sidecar = directory / official.RECOVERY_FILE
+    original_sidecar = sidecar.read_bytes()
+    if stage == 'complete':
+        assert official.record_recovery(registered, tmp_path)['status'] == 'RECOVERY_RECORDED'
+    else:
+        with pytest.raises(ValueError): official.record_recovery(registered, tmp_path)
+        forbidden = AsyncMock()
+        with pytest.raises(ValueError): asyncio.run(official.execute(registered, tmp_path, forbidden))
+        forbidden.assert_not_called()
+    assert sidecar.read_bytes() == original_sidecar and all(p.read_bytes() == raw for p, raw in originals.items())

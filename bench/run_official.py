@@ -2,6 +2,7 @@
 
 Preflight is offline and read-only. Interrupted/unsafe captures leave an exclusive
 reservation that blocks resume rather than hiding a possibly executed attempt.
+The P18-R2 exception requires a separately recorded, exact-batch abandonment.
 """
 import argparse
 import asyncio
@@ -34,6 +35,12 @@ SOURCES = tuple(f"src/outage_test/{n}.py" for n in ("client", "provider", "fault
 LIMIT = 16 * 1024 * 1024
 MAX_JSON_DEPTH = 16  # Honest official records use at most seven container levels.
 LEDGER_FIELDS = set("attempt_id job_id arrival_time idempotency_key correlation_id decision executed in_flight_at_arrival service_time execution_ordinal resource_overflow finished completion_time".split())
+RECOVERY_PATH = "S3/C4/run-2-64520e2f05e143dc816e7961285adf0b.json"
+RECOVERY_FILE = "recovery-20261105-slot30.json"
+ORIGINAL_RUNNER = dict(version=1, git_commit="f2260d1d6d179fd1f1913d3ff87d1867c48cf571",
+    sha256="c64fa8b158a783209d75972122edc628b95dca4ea5d6795b786832e52f619036")
+# SHA256 of canonical JSON: the ordered 29 lists of {path, sha256, status, attempt}.
+RECOVERY_PREFIX_SHA = "a36780d71956ea49aaef87fe0d8785126cc15ca2304ef143c5b708dbbdba0b66"
 
 
 def require(condition, message="invalid official evidence"):
@@ -321,13 +328,58 @@ def finish(fd, directory, value):
     return digest(raw)
 
 
-def read_at(fd, name):
+def read_raw_at(fd, name):
     incoming = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=fd)
     try:
-        raw = read_fd(incoming)
-        return decoded(raw), digest(raw)
+        return read_fd(incoming)
     finally:
         os.close(incoming)
+
+
+def read_at(fd, name):
+    raw = read_raw_at(fd, name)
+    return decoded(raw), digest(raw)
+
+
+def recovery_record(registration, who):
+    slot = registration["scenarios"]["order"][29]
+    require(encoded(slot) == encoded(dict(ordinal=30, scenario="S3", config="C4", round=2,
+        run_slot=2, workload_seed=12002, fault_seed=12002)), "wrong recovery slot")
+    return dict(schema_version=1, official=True, authorization="P18-R2 execution 34; owner approved 2026-11-05",
+        cause="Shutdown 2026-11-03T01:17:00Z; batch exit code unknown", slot=slot, attempt=1,
+        status="ABANDONED", path=RECOVERY_PATH, bytes=0, sha256=digest(b""),
+        original_runner=ORIGINAL_RUNNER, runner=who, registration=registration["fingerprint"],
+        retained_prefix_sha256=RECOVERY_PREFIX_SHA)
+
+
+def read_attempt(fd, filename, path, registration, who, recovery):
+    if path == RECOVERY_PATH:
+        require(recovery is not None, "missing recovery record")
+        require(read_raw_at(fd, filename) == b"", "changed abandoned reservation")
+        return 30, dict(path=path, sha256=digest(b""), status="ABANDONED", attempt=1,
+            recovery=dict(path=RECOVERY_FILE, sha256=digest(encoded(recovery)), record=recovery))
+    doc, sha = read_at(fd, filename)
+    slot = doc["slot"]
+    require(path.startswith(f"{slot['scenario']}/{slot['config']}/run-{slot['run_slot']}-"))
+    provenance = ORIGINAL_RUNNER if recovery is not None and slot["ordinal"] <= 29 else who
+    require(doc["validity"] == assess(doc, registration, provenance), "corrupted resume validity")
+    return slot["ordinal"], dict(path=path, sha256=sha, status=doc["validity"]["status"], attempt=doc["attempt"])
+
+
+def record_recovery(registration, root=ROOT):
+    """Explicit create-only preparation; never captures or repairs an attempt."""
+    who = identity(root)
+    with official_root(root) as fd:
+        discover(fd, registration, who, preparing=True)
+        if RECOVERY_FILE not in os.listdir(fd):
+            output = os.open(RECOVERY_FILE, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=fd)
+            try:
+                os.fsync(fd)  # A partial sidecar remains a blocking reservation.
+                finish(output, fd, recovery_record(registration, who))
+            finally:
+                os.close(output)
+        discover(fd, registration, who)
+    return dict(status="RECOVERY_RECORDED", recovery_record=RECOVERY_FILE, abandoned_attempts=1, official_runs_executed=0)
 
 
 def manifest(attempts, registration, who):
@@ -338,12 +390,18 @@ def manifest(attempts, registration, who):
         slots=slots, status="COMPLETE" if all(s["status"] == "VALID" for s in slots) else "INCOMPLETE")
 
 
-def discover(fd, registration, who):
+def discover(fd, registration, who, *, preparing=False):
     attempts, manifests = {i: [] for i in range(1, 52)}, []
     cells = {(s["scenario"], s["config"]) for s in registration["scenarios"]["order"]}
     entries = os.listdir(fd)
     require(len(entries) <= 158, "official directory limit")
+    recovery = recovery_record(registration, who) if preparing or RECOVERY_FILE in entries else None
+    if RECOVERY_FILE in entries:
+        stored, sha = read_at(fd, RECOVERY_FILE)
+        require(encoded(stored) == encoded(recovery) and sha == digest(encoded(recovery)), "mismatched recovery record")
     for name in sorted(entries):
+        if name == RECOVERY_FILE:
+            continue
         if re.fullmatch(r"manifest-[a-f0-9]{32}\.json", name):
             value, _ = read_at(fd, name)
             manifests.append(value)
@@ -360,11 +418,8 @@ def discover(fd, registration, who):
                     for filename in filenames:
                         match = re.fullmatch(r"run-([1-3])-[a-f0-9]{32}\.json", filename)
                         require(match is not None, "unexpected official result")
-                        doc, sha = read_at(directory, filename)
-                        require(doc["slot"]["scenario"] == name and doc["slot"]["config"] == cfg and doc["slot"]["run_slot"] == int(match[1]))
-                        require(doc["validity"] == assess(doc, registration, who), "corrupted resume validity")
-                        attempts[doc["slot"]["ordinal"]].append(dict(path=f"{name}/{cfg}/{filename}", sha256=sha,
-                            status=doc["validity"]["status"], attempt=doc["attempt"]))
+                        ordinal, row = read_attempt(directory, filename, f"{name}/{cfg}/{filename}", registration, who, recovery)
+                        attempts[ordinal].append(row)
                 finally:
                     os.close(directory)
         finally:
@@ -373,9 +428,14 @@ def discover(fd, registration, who):
     for values in attempts.values():
         values.sort(key=lambda row: row["attempt"])
         require(len(values) <= 3 and [v["attempt"] for v in values] == list(range(1, len(values)+1)), "ambiguous attempt sequence")
-        require(all(v["status"] == "INVALID" for v in values[:-1]), "attempt after VALID")
+        require(all(v["status"] in ("INVALID", "ABANDONED") for v in values[:-1]), "attempt after VALID")
         require(not blocked or not values, "resume violates registered order")
-        blocked |= not values or (len(values) < 3 and values[-1]["status"] == "INVALID")
+        blocked |= not values or (len(values) < 3 and values[-1]["status"] != "VALID")
+    if recovery is not None:
+        require(digest(encoded([attempts[i] for i in range(1, 30)])) == RECOVERY_PREFIX_SHA, "changed recovery prefix")
+        require(attempts[30] and attempts[30][0]["status"] == "ABANDONED", "missing abandoned reservation")
+        require(not preparing or (not manifests and len(attempts[30]) == 1 and not any(attempts[i] for i in range(31, 52))),
+            "recovery preparation requires original inventory")
     for previous in manifests:
         require(type(previous) is dict and type(previous.get("slots")) is list and len(previous["slots"]) == 51)
         subset = {}
@@ -417,8 +477,11 @@ async def execute(registration, root=ROOT, capture=None):
                 finish(output, fd, final)
             finally:
                 os.close(output)
-        return dict(status=final["status"], valid_slots=sum(v["status"] == "VALID" for v in final["slots"]),
+        result = dict(status=final["status"], valid_slots=sum(v["status"] == "VALID" for v in final["slots"]),
             incomplete_slots=[v["slot"] for v in final["slots"] if v["status"] != "VALID"], official_runs_executed=count)
+        if attempts[30] and attempts[30][0]["status"] == "ABANDONED":
+            result.update(abandoned_attempts=1, recovery_record=RECOVERY_FILE)
+        return result
 
 
 def main(argv=None):
@@ -426,12 +489,13 @@ def main(argv=None):
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--preflight", action="store_true")
     mode.add_argument("--execute", action="store_true", help="requires separate authorization; starts a local provider")
+    mode.add_argument("--record-recovery", action="store_true", help="requires separate authorization; records only the approved abandonment")
     args = parser.parse_args(argv)
     try:
         registration = preflight()
         result = (dict(status="PREFLIGHT_OK", cells=17, slots=51, lock_sha256=LOCK_SHA,
             order_sha256=registration["lock"]["order_sha256"], official_runs_executed=0) if args.preflight
-            else asyncio.run(execute(registration)))
+            else record_recovery(registration) if getattr(args, "record_recovery", False) else asyncio.run(execute(registration)))
         print(json.dumps(result, sort_keys=True))
         return 0 if result["status"] != "INCOMPLETE" else 2
     except (OSError, ValueError, KeyError, TypeError, asyncio.CancelledError):
