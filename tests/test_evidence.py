@@ -6,6 +6,7 @@ import hashlib
 import inspect
 import json
 import math
+import os
 from pathlib import Path
 import re
 
@@ -201,8 +202,32 @@ def test_calibration_corruption_rejected(smoke, tmp_path, damage):
         audit(bad, tmp_path)
 
 
-def test_no_official_results_or_credentials():
-    assert not any(p.is_file() for p in (ROOT / "results" / "official").rglob("*"))
+def official_state(directory):
+    state = {}
+    for path in directory.rglob("*"):
+        assert not path.is_symlink()
+        if path.is_file():
+            info = path.stat()
+            with os.fdopen(os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NOATIME), "rb") as stream:
+                state[path.relative_to(directory)] = (hashlib.file_digest(stream, "sha256").digest(),
+                    info.st_mode, info.st_size, info.st_uid, info.st_gid, info.st_nlink, info.st_ino,
+                    info.st_atime_ns, info.st_mtime_ns, info.st_ctime_ns)
+    return state
+
+
+@pytest.fixture(scope="session", autouse=True)
+def official_results_unchanged():
+    before = official_state(ROOT / "results" / "official")
+    yield before
+    assert official_state(ROOT / "results" / "official") == before
+
+
+@pytest.mark.parametrize("empty_official", [False, True], ids=["existing-official", "empty-official"])
+def test_no_official_results_or_credentials(official_results_unchanged, tmp_path, empty_official):
+    directory = tmp_path / "official" if empty_official else ROOT / "results" / "official"
+    if empty_official: directory.mkdir()
+    before = official_state(directory)
+    assert before == ({} if empty_official else official_results_unchanged)
     patterns = {
         "private-key": rb"-----BEGIN (?:[A-Z0-9 ]+ )?PRIVATE KEY-----",
         "github": rb"\b(?:gh[pousr]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{40,})",
@@ -220,3 +245,4 @@ def test_no_official_results_or_credentials():
             def reject_constant(value):
                 raise ValueError("nonfinite JSON number")
             json.loads(raw, parse_constant=reject_constant)
+    assert official_state(directory) == before
