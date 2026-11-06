@@ -39,11 +39,45 @@ FORMULAS = {
 
 def read(path):
     require(path.absolute() == path.resolve(), "symlink analysis input")
-    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_NOATIME)
     try:
         return official.read_fd(fd)
     finally:
         os.close(fd)
+
+
+def validated_attempts(manifest, raw, reg):
+    """Reuse frozen validators in memory, without the capture runner's file readers."""
+    recovery = official.recovery_record(reg, CAPTURE)
+    require(raw[official.RECOVERY_FILE] == official.encoded(recovery), "wrong recovery record")
+    attempts, documents = {}, {}
+    require(len(manifest["slots"]) == 51, "missing registered slots")
+    for slot, row in zip(reg["scenarios"]["order"], manifest["slots"], strict=True):
+        values = []
+        for attempt in row["attempts"]:
+            name = attempt["path"]
+            if name == official.RECOVERY_PATH:
+                require(slot["ordinal"] == 30 and raw[name] == b"", "wrong abandoned reservation")
+                value = dict(path=name, sha256=official.digest(b""), status="ABANDONED", attempt=1,
+                    recovery=dict(path=official.RECOVERY_FILE, sha256=official.digest(raw[official.RECOVERY_FILE]), record=recovery))
+            else:
+                doc = official.decoded(raw[name])
+                require(official.encoded(doc) == raw[name] and doc["slot"] == slot, "wrong slot or noncanonical attempt")
+                require(name.startswith(f"{slot['scenario']}/{slot['config']}/run-{slot['run_slot']}-"))
+                who = official.ORIGINAL_RUNNER if slot["ordinal"] <= 29 else CAPTURE
+                assessment = official.assess(doc, reg, who)
+                require(doc["validity"] == assessment, "unsupported validity label")
+                value = dict(path=name, sha256=official.digest(raw[name]), status=assessment["status"], attempt=doc["attempt"])
+                documents[name] = doc
+            require(value == attempt, "manifest attempt mismatch")
+            values.append(value)
+        require(1 <= len(values) <= 3 and [v["attempt"] for v in values] == list(range(1, len(values) + 1)), "attempt cap or numbering")
+        require(all(v["status"] in ("INVALID", "ABANDONED") for v in values[:-1]) and values[-1]["status"] == "VALID", "incomplete or duplicate VALID slot")
+        attempts[slot["ordinal"]] = values
+    require(manifest == official.manifest(attempts, reg, CAPTURE), "manifest registration/order mismatch")
+    require(official.digest(official.encoded([attempts[i] for i in range(1, 30)])) == official.RECOVERY_PREFIX_SHA, "changed retained prefix")
+    require([a["status"] for a in attempts[30]] == ["ABANDONED", "VALID"], "wrong recovery accounting")
+    return documents
 
 
 def audit(root=ROOT, registration=None):
@@ -64,24 +98,22 @@ def audit(root=ROOT, registration=None):
             expected[name] = attempt["sha256"]
     paths = list(base.rglob("*"))
     require(not any(p.is_symlink() for p in paths), "symlink official inventory")
-    require({p.relative_to(base).as_posix() for p in paths if p.is_file()} == set(expected), "official inventory mismatch")
+    directories = {s["scenario"] for s in reg["scenarios"]["order"]} | {s["scenario"] + "/" + s["config"] for s in reg["scenarios"]["order"]}
+    require(all(p.relative_to(base).as_posix() in directories for p in paths if p.is_dir()), "unexpected official directory")
+    require({p.relative_to(base).as_posix() for p in paths} == set(expected) | directories, "official inventory mismatch")
+    raw_files = {}
     for name, sha in expected.items():
-        require(official.digest(read(base / name)) == sha, "attempt hash mismatch: " + name)
-    fd = os.open(base, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
-    try:
-        attempts, manifests = official.discover(fd, reg, CAPTURE)
-    finally:
-        os.close(fd)
-    require(manifests == [official.manifest(attempts, reg, CAPTURE)] and manifest == manifests[0])
+        raw_files[name] = read(base / name)
+        require(official.digest(raw_files[name]) == sha, "attempt hash mismatch: " + name)
+    checked = validated_attempts(manifest, raw_files, reg)
     require(manifest["status"] == "COMPLETE" and len(expected) == 55, "incomplete official evidence")
-    require([a["status"] for a in attempts[30]] == ["ABANDONED", "VALID"], "wrong recovery accounting")
     documents, excluded, previous_end = [], [], {}
     for row in manifest["slots"]:
         for attempt in row["attempts"]:
             if attempt["status"] == "ABANDONED":
                 excluded.append(dict(slot=row["slot"], **attempt))
                 continue
-            doc = official.decoded(read(base / attempt["path"]))
+            doc = checked[attempt["path"]]
             group = doc["slot"]["ordinal"] <= 29
             start = doc["metadata"]["health"]["context"]["t0"]
             require(start >= previous_end.get(group, 0), "registered execution order mismatch")

@@ -4,7 +4,6 @@ from copy import deepcopy
 import hashlib
 import json
 import math
-import shutil
 from statistics import median
 from unittest.mock import Mock
 
@@ -12,6 +11,7 @@ import pytest
 
 from bench import analysis, report, run_official as official
 from outage_test import runner
+from test_evidence import official_state
 
 
 @pytest.fixture(autouse=True)
@@ -22,7 +22,7 @@ def no_capture(monkeypatch):
 
 def hashes():
     base = analysis.ROOT / "results/official"
-    return {p.relative_to(base).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+    return {p.relative_to(base).as_posix(): hashlib.sha256(analysis.read(p)).hexdigest()
             for p in base.rglob("*") if p.is_file()}
 
 
@@ -87,7 +87,7 @@ def test_all_metrics_sources_rounds_and_summary_independently(measured):
         assert [r["round"] for r in cell["runs"]] == [1, 2, 3]
         values = []
         for r in cell["runs"]:
-            raw = (analysis.ROOT / r["path"]).read_bytes()
+            raw = analysis.read(analysis.ROOT / r["path"])
             assert hashlib.sha256(raw).hexdigest() == r["sha256"] == measured["inputs"][r["path"]]
             doc = json.loads(raw)
             assert r["seed"] == 12000 + r["round"] == doc["slot"]["fault_seed"]
@@ -191,7 +191,7 @@ def test_recovery_uses_actual_issuance_and_observed_completions(registered, succ
 
 def test_receipt_extras_not_hidden_by_missing_job_and_zero_denominator(measured):
     r = measured["cells"]["S0/C0"]["runs"][0]
-    doc = json.loads((analysis.ROOT / r["path"]).read_bytes())
+    doc = json.loads(analysis.read(analysis.ROOT / r["path"]))
     doc["ledger"] = [deepcopy(doc["ledger"][0]), deepcopy(doc["ledger"][0])]
     values, _ = analysis.metrics(doc, measured["frozen_decision"]["recovery"])
     assert values["extra_attempts_per_logical_request"] == 1 / 600
@@ -208,8 +208,20 @@ def test_receipt_extras_not_hidden_by_missing_job_and_zero_denominator(measured)
 @pytest.fixture(scope="module")
 def evidence_copy(tmp_path_factory):
     root = tmp_path_factory.mktemp("g9-evidence")
-    shutil.copytree(analysis.ROOT / "results/official", root / "results/official")
+    base = analysis.ROOT / "results/official"
+    for path in base.rglob("*"):
+        if path.is_file():
+            target = root / "results/official" / path.relative_to(base)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(analysis.read(path))
     return root
+
+
+def test_fresh_checkout_audit_preserves_all_evidence_metadata(evidence_copy, registered):
+    directory = evidence_copy / "results/official"
+    before = official_state(directory)
+    analysis.audit(evidence_copy, registered)
+    assert official_state(directory) == before
 
 
 @pytest.mark.parametrize("damage", ["missing", "bytes", "sidecar", "reservation", "manifest", "extra", "symlink"])
@@ -239,7 +251,7 @@ def test_tampered_missing_or_ambiguous_evidence_rejected(evidence_copy, register
 @pytest.mark.parametrize("damage", ["runner", "seed", "unknown_field"])
 def test_provenance_or_schema_cannot_be_trusted_from_labels(measured, registered, damage):
     r = measured["cells"]["S3/C4"]["runs"][1]
-    doc = json.loads((analysis.ROOT / r["path"]).read_bytes())
+    doc = json.loads(analysis.read(analysis.ROOT / r["path"]))
     if damage == "runner": doc["runner"]["git_commit"] = "0" * 40
     elif damage == "seed": doc["slot"]["fault_seed"] += 1
     else: doc["unknown"] = "unregistered"
@@ -275,6 +287,7 @@ def test_reader_and_failed_cli_are_readonly(monkeypatch, capsys):
     opening = analysis.os.open
     def readonly(path, flags, *args, **kwargs):
         assert not flags & (analysis.os.O_WRONLY | analysis.os.O_RDWR | analysis.os.O_CREAT | analysis.os.O_TRUNC)
+        assert flags & analysis.os.O_NOATIME
         return opening(path, flags, *args, **kwargs)
     monkeypatch.setattr(analysis.os, "open", readonly)
     assert analysis.read(analysis.ROOT / "results/official" / analysis.MANIFEST)

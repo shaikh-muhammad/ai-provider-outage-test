@@ -1,6 +1,6 @@
 {
   "analysis_sources": {
-    "bench/analysis.py": "d751ad3d387f756899e9445874055d492d79b3b01530a308beabf9825788651f",
+    "bench/analysis.py": "2b291ba85d1696769c5e4aa398f75de255e388fed0a9aaf181dab11ca4e033ed",
     "bench/report.py": "e78b883dc1cdf819c349a1a2ab13e4f8562cdfc66006da720da719596038fefb"
   },
   "capture_runner": {
