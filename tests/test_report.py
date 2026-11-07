@@ -6,10 +6,11 @@ import json
 import math
 from statistics import median
 from unittest.mock import Mock
+from xml.etree import ElementTree
 
 import pytest
 
-from bench import analysis, report, run_official as official
+from bench import analysis, charts, report, run_official as official
 from outage_test import runner
 from test_evidence import official_state
 
@@ -261,7 +262,7 @@ def test_provenance_or_schema_cannot_be_trusted_from_labels(measured, registered
 def test_freshness_and_byte_identical_chart_rerender(measured, rendered):
     report.persist(rendered, check=True)
     chart = report.timeline(measured)
-    assert report.chart_bytes(chart) == rendered["docs/retry-storm.svg"]
+    assert report.chart_bytes(chart, measured) == rendered["docs/retry-storm.svg"]
     for config, trace in chart["traces"].items():
         runs = measured["cells"]["S2/" + config]["runs"]
         primary = measured["frozen_decision"]["metrics"]["S2"]["primary"]
@@ -285,7 +286,7 @@ def test_readme_case_study_tracks_saved_measurements(measured, rendered):
     assert "```mermaid\nflowchart LR" in text
     assert not any(line.startswith("## " + str(n) + ".") for line in text.splitlines() for n in range(1, 14))
     assert "90 → 0 duplicate executions per run" in text
-    assert "1.615 → 3.025 seconds p99 latency" in text
+    assert "1.62 → 3.02 seconds p99 latency" in text
     changed = deepcopy(measured)
     changed["cells"]["S3/C4"]["summary"]["duplicate_provider_executions"].update(median=7, min=7, max=7)
     assert "90 → 7 duplicate executions per run" in report.readme_highlights(changed)
@@ -317,3 +318,63 @@ def test_reader_and_failed_cli_are_readonly(monkeypatch, capsys):
     monkeypatch.setattr(analysis, "analyze", Mock(side_effect=ValueError("fixture audit failure")))
     assert report.main(["--check"]) == 1
     assert "fixture audit failure" in capsys.readouterr().err
+
+
+def test_both_svgs_are_deterministic_accessible_and_zero_based(measured, rendered):
+    pairs = [(charts.chart_bytes(report.timeline(measured), measured), "docs/retry-storm.svg"),
+             (charts.ladder_bytes(measured), "docs/mechanism-ladder.svg")]
+    for raw, path in pairs:
+        assert raw == rendered[path]
+        svg = ElementTree.fromstring(raw)
+        assert svg.attrib["role"] == "img" and svg.attrib["aria-labelledby"] == "chart-title chart-desc"
+        assert svg.find("{http://www.w3.org/2000/svg}title").text
+        assert svg.find("{http://www.w3.org/2000/svg}desc").text
+        identifiers = {element.attrib["id"] for element in svg.iter() if "id" in element.attrib}
+        assert all(value[5:-1] in identifiers for element in svg.iter()
+                   if (value := element.attrib.get("clip-path", "")).startswith("url(#"))
+        assert b"<text" in raw and b"HARMFUL" in rendered["docs/mechanism-ladder.svg"]
+    for fig in (charts.figure(report.timeline(measured), measured), charts.ladder_figure(measured)):
+        assert all(ax.get_ylim()[0] == 0 for ax in fig.axes)
+
+
+def test_ladder_shows_actual_goal_and_safety_values(measured):
+    fig = charts.ladder_figure(measured)
+    assert len(fig.axes) == 9
+    for row, (scenario, metrics, _) in enumerate(charts.PANELS):
+        for col, metric in enumerate(metrics):
+            scale = 100 if metric.endswith("success_fraction") else 1
+            expected = [measured["cells"][f"{scenario}/C{i}"]["summary"][metric]["median"] * scale for i in range(5)]
+            ax = fig.axes[row*3+col]
+            dots = [line for line in ax.lines if line.get_marker() == "o"]
+            assert [line.get_ydata()[0] for line in dots] == expected
+            assert [text.get_text() for text in ax.texts] == [f"{value:.3g}" for value in expected]
+    assert "recovery: r2" in charts.guard_notes(measured, "S2")
+    assert "C3 → C4 [+] EFFECTIVE" in charts.guard_notes(measured, "S3")
+
+
+@pytest.mark.parametrize("damage", ["guard", "verdict", "summary", "comparison_inventory"])
+def test_chart_rejects_changed_guardrails_and_summaries(measured, damage):
+    data = deepcopy(measured)
+    if damage == "guard": data["comparisons"][1]["guardrails"][0]["passed"] = False
+    elif damage == "verdict": data["comparisons"][1]["verdict"] = "EFFECTIVE"
+    elif damage == "summary": data["cells"]["S1/C0"]["summary"]["latency_p99_seconds"]["median"] = 0
+    else: data["comparisons"].pop()
+    with pytest.raises(ValueError, match="chart"):
+        charts.ladder_bytes(data)
+
+
+def test_outage_costs_and_all_scientific_fields_preserved(measured, rendered):
+    text = rendered["README.md"].decode()
+    assert "200 [183, 203] fail-fast outcomes per 600 jobs" in text
+    assert "89.3% → 66.5%" in text and "100% → 88.7%" in text
+    assert "round 2 took 11 seconds, exceeding its 10-second limit" in text
+    assert "success 89.3% → 66.5%" in charts.cost_caption(measured)
+    assert "C4 fail-fast outcomes 200 per 600 jobs" in charts.cost_caption(measured)
+    assert "I did not implement or test any fallback" in text
+    derived = json.loads(rendered["docs/chart_data.json"])
+    assert derived.pop("timeline") == report.timeline(measured)
+    sources = derived.pop("analysis_sources")
+    assert sources["bench/charts.py"] == hashlib.sha256(analysis.read(analysis.ROOT / "bench/charts.py")).hexdigest()
+    assert derived == measured
+    primary = measured["cells"]["S1/C0"]["summary"]["attempts_per_logical_request"]["median"]
+    assert str(primary) in rendered["docs/results.md"].decode()
