@@ -271,6 +271,29 @@ def test_freshness_and_byte_identical_chart_rerender(measured, rendered):
     assert len([line for line in rendered["README.md"].decode().splitlines() if line.startswith("## ")]) == 13
 
 
+def test_readme_only_edit_preserves_other_derivatives(measured, rendered, monkeypatch):
+    monkeypatch.setattr(report, "README", report.README + "\nEditorial freshness fixture.\n")
+    changed = report.render(measured)
+    assert changed["README.md"] != rendered["README.md"]
+    assert changed == report.render(measured)
+    assert {name: raw for name, raw in changed.items() if name != "README.md"} == {
+        name: raw for name, raw in rendered.items() if name != "README.md"}
+
+
+def test_readme_case_study_tracks_saved_measurements(measured, rendered):
+    text = rendered["README.md"].decode()
+    assert "```mermaid\nflowchart LR" in text
+    assert not any(line.startswith("## " + str(n) + ".") for line in text.splitlines() for n in range(1, 14))
+    assert "90 → 0 duplicate executions per run" in text
+    assert "1.615 → 3.025 seconds p99 latency" in text
+    changed = deepcopy(measured)
+    changed["cells"]["S3/C4"]["summary"]["duplicate_provider_executions"].update(median=7, min=7, max=7)
+    assert "90 → 7 duplicate executions per run" in report.readme_highlights(changed)
+    assert "7 [7, 7]" in report.readme_results(changed)
+    for target in ("docs/results.md", "docs/chart_data.json", "docs/engineering-log.md", "docs/retry-storm.svg"):
+        assert target in text and (analysis.ROOT / target).is_file()
+
+
 @pytest.mark.parametrize("name", report.OUTPUTS)
 def test_stale_outputs_fail_without_writing(rendered, tmp_path, name):
     for path, raw in rendered.items():
