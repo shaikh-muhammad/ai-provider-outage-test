@@ -15,10 +15,10 @@ ICONS = {"HARMFUL": "[!]", "EFFECTIVE": "[+]", "NO MEASURABLE EFFECT": "[=]", "I
 GUARDS = {"latency_p99_seconds": "p99", "outside_outage_success_fraction": "outside success",
           "recovery_seconds": "recovery", "success_fraction": "success", "extra_attempts": "extra attempts"}
 PANELS = (
-    ("S1", ("attempts_per_logical_request", "latency_p99_seconds"), ("Client attempts / request", "Safety: p99 latency (seconds)")),
+    ("S1", ("attempts_per_logical_request", "latency_p99_seconds"), ("Calls per planned request", "Safety: slowest 1% wait (seconds)")),
     ("S2", ("outage_provider_attempts_per_outage_issued_job", "outside_outage_success_fraction"),
-     ("Outage calls / outage request", "Safety: outside-outage success (%)")),
-    ("S3", ("duplicate_provider_executions", "extra_attempts"), ("Duplicate executions / run", "Safety: extra client attempts / run")),
+     ("Calls per outage request", "Safety: success outside outage (%)")),
+    ("S3", ("duplicate_provider_executions", "extra_attempts"), ("Repeated work per run", "Safety: extra calls per run")),
 )
 
 
@@ -146,10 +146,10 @@ def ladder_figure(data, theme="light"):
             panel(fig.add_subplot(grid[row, col]), data, scenario, metric, title, theme)
         primary = next(c for c in data["comparisons"] if c["scenario"] == scenario and c["role"] == "primary")
         bounds = grid[0, col].get_position(fig)
-        fig.text((bounds.x0+bounds.x1)/2, .94, f'{scenario} · C0 → C4\n{ICONS[primary["verdict"]]} {primary["verdict"]}', ha="center", fontsize=14, weight="bold")
+        fig.text((bounds.x0+bounds.x1)/2, .94, f'{dict(S1="S1 · Rate-limit burst", S2="S2 · Outage", S3="S3 · Lost replies")[scenario]}\nC0 → C4 {ICONS[primary["verdict"]]} {primary["verdict"]}', ha="center", fontsize=14, weight="bold")
         fig.text(bounds.x0, .42, guard_notes(data, scenario), fontsize=8.5, va="top", linespacing=1.4)
     fig.text(.5, .025, "Dots: median; whiskers: min–max of three runs, not confidence intervals. Numeric axes start at zero.\n"
-             "C0 retries · C1 deadline · C2 randomized backoff · C3 circuit breaker · C4 idempotency\n"
+             "C0 baseline retries · C1 + time limit · C2 + smarter waiting · C3 + circuit breaker · C4 + job ID\n"
              "Stepwise labels describe safety-check size; every registered HARMFUL verdict still applies.\n"
              "S2 recovery and all remaining safety checks are retained in the report and paired-round notes.", ha="center", fontsize=10)
     return fig

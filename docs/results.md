@@ -1,6 +1,12 @@
 # G9: official simulator results
 
-The full protection stack eliminated duplicate work after lost replies, but failed the registered safety checks during rate limits and outages. Successful requests matter alongside calls reaching the local simulated provider. Fewer calls can mean failed requests. The registered safety checks therefore decide whether a protection helped: C4 is HARMFUL in S1/S2 and EFFECTIVE in S3. These are three-run simulator observations, not real-provider guarantees.
+## Start here
+
+A scripted local service was tested under four situations.
+Retries can repeat completed work or increase waiting.
+Job IDs removed repeated work after lost replies.
+Rate limits and outages still produced worse safety outcomes.
+These small-sample simulations do not establish real-provider guarantees.
 
 [Outage timeline](#retry-timeline) · [S1–S3 goals and safety checks](#mechanism-ladder) · [Readable case study](../README.md). Technical tables retain unrounded numeric values; [chart_data.json](chart_data.json) preserves per-run values, input hashes, formulas and verdicts.
 
@@ -153,7 +159,7 @@ MARGINAL means every failing safety check worsened by less than 5.0% after round
 <picture>
 <source media="(prefers-color-scheme: dark)" srcset="protection-ladder-dark.svg">
 <source media="(prefers-color-scheme: light)" srcset="protection-ladder-light.svg">
-<img src="protection-ladder-light.svg" alt="Six panels compare C0–C4 goals and safety: S1 attempts and p99 latency, S2 outage calls and outside-outage success, S3 duplicate executions and extra attempts; ranges and registered verdicts are shown." width="100%">
+<img src="protection-ladder-light.svg" alt="Six panels compare baseline retries through full protection: rate-limit calls and waiting time; outage calls and success outside the outage; lost-reply repeated work and extra calls. Ranges and verdicts are shown." width="100%">
 </picture>
 
 | Scenario | C0 reference: primary median [min, max] | C1 vs C0 | C2 vs C1 | C3 vs C2 | C4 vs C3* |
@@ -170,7 +176,7 @@ MARGINAL means every failing safety check worsened by less than 5.0% after round
 <picture>
 <source media="(prefers-color-scheme: dark)" srcset="retry-storm-dark.svg">
 <source media="(prefers-color-scheme: light)" srcset="retry-storm-light.svg">
-<img src="retry-storm-light.svg" alt="S2 outage: blue C0 and dashed orange C4 provider calls, shaded 20–35 second outage and three-round ranges; fewer calls came with lower success and slower recovery." width="100%">
+<img src="retry-storm-light.svg" alt="S2 outage: blue C0 baseline retries and dashed orange C4 full protection; calls, shaded outage and three-run ranges. Fewer calls came with lower success and slower recovery." width="100%">
 </picture>
 
 Lines select each config's median registered S2 primary run; ties use the earliest round. Representatives may use different rounds; paired verdicts still use all three matching rounds. Bands show per-second min–max across all three runs. The complete receipt-arrival horizon is shown, with a zero-based y axis. The shaded [20,35) second outage is registered; no traffic is rerun for this chart.

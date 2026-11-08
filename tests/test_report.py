@@ -4,6 +4,7 @@ from copy import deepcopy
 import hashlib
 import json
 import math
+import re
 from statistics import median
 from unittest.mock import Mock
 from xml.etree import ElementTree
@@ -269,7 +270,7 @@ def test_freshness_and_byte_identical_chart_rerender(measured, rendered):
         chosen = next(r for r in runs if r["round"] == trace["round"])
         assert chosen["metrics"][primary] == median(r["metrics"][primary] for r in runs)
         assert all(lo <= x <= hi for lo, x, hi in zip(trace["min"], trace["values"], trace["max"], strict=True))
-    assert len([line for line in rendered["README.md"].decode().splitlines() if line.startswith("## ")]) == 13
+    assert len([line for line in rendered["README.md"].decode().splitlines() if line.startswith("## ")]) == 12
 
 
 def test_readme_only_edit_preserves_other_derivatives(measured, rendered, monkeypatch):
@@ -286,7 +287,7 @@ def test_readme_case_study_tracks_saved_measurements(measured, rendered):
     assert "```mermaid\nflowchart LR" in text
     assert not any(line.startswith("## " + str(n) + ".") for line in text.splitlines() for n in range(1, 14))
     assert "90 → 0 duplicate executions per run" in text
-    assert "1.62 → 3.02 seconds p99 latency" in text
+    assert "1.62 → 3.02 seconds waiting time for the slowest 1% of outcomes" in text
     changed = deepcopy(measured)
     changed["cells"]["S3/C4"]["summary"]["duplicate_provider_executions"].update(median=7, min=7, max=7)
     assert "90 → 7 duplicate executions per run" in report.readme_highlights(changed)
@@ -403,21 +404,33 @@ def test_saved_boundary_and_every_harmful_step_are_explained(measured, rendered)
     assert "decreased 5.0%" in charts.strength(boundary)
     for c in measured["comparisons"]:
         if c["role"] == "stepwise" and c["verdict"] == "HARMFUL":
-            assert charts.strength(c) in rendered["README.md"].decode()
             assert charts.strength(c, precision="") in rendered["docs/results.md"].decode()
+            assert c["verdict"] == "HARMFUL"
+    assert "7 HARMFUL comparisons" in rendered["README.md"].decode()
+    assert "4 are MARGINAL and 3 CLEAR" in rendered["README.md"].decode()
+    assert "docs/results.md#verdict-strength" in rendered["README.md"].decode()
+    assert "## Verdict strength" in rendered["docs/results.md"].decode()
 
 
 def test_case_study_order_theme_embeds_and_professional_voice(rendered):
     text = rendered["README.md"].decode()
     headings = [line[3:] for line in text.splitlines() if line.startswith("## ")]
-    assert headings == ["Findings", "Outage: fewer calls, more failed requests", "Essential terms",
-        "Results across four failure conditions", "How the protection ladder performed", "Three practical lessons",
-        "Problem and architecture", "C0–C4 protections", "Stepwise verdict strength", "Failures and recovery",
-        "Limitations", "Reproduction", "Testing, tools and provenance"]
-    assert not any(word in text for word in ("I stopped", "I added", "I measured", "I used"))
+    assert headings == ["The short version", "What was tested", "Results",
+        "Chart 1 — Outage: fewer calls, more failed requests", "Chart 2 — How each protection step performed",
+        "Three practical lessons", "How the experiment works", "Data quality", "Limitations",
+        "How to reproduce", "Tests", "Tools and credits"]
+    assert not re.search(r"\b(?:I|I'm|I've|my|me|we|our|us)\b", text, re.I)
     assert "VS Code Codex, GPT-6.1 Sol" in text and "No AI model generated benchmark responses" in text
-    terms = text.split("## Essential terms\n\n", 1)[1].split("\n\n##", 1)[0]
-    assert len(terms.splitlines()) == 6
+    glossary = text.split("<summary>Glossary</summary>", 1)[1].split("</details>", 1)[0]
+    assert all(term in glossary for term in ("Request/job", "Attempt/call", "p99", "Circuit breaker", "Backoff/jitter",
+        "Job ID/idempotency", "Fail-fast", "Recovery time", "Safety check", "Run/setup/scenario", "Valid/invalid/abandoned",
+        "Seed", "Provider record/ledger", "Marginal/clear"))
+    opening = "\n".join(text.splitlines()[:30])
+    assert all(term in opening for term in ("simulated AI service", "90 → 0", "1.62 → 3.02", "89.3% → 66.5%",
+        "three runs", "does not demonstrate real-provider performance", "Measure successful work"))
+    assert "/home/sm" not in text and "I did not shut down the VM" not in text
+    assert "## Stepwise verdict strength" not in text
+    assert "| Situation | Goal measured | C0 baseline retries | C4 full protection | Verdict |" in text
     for path in ("README.md", "docs/results.md"):
         document = rendered[path].decode()
         assert document.count("<picture>") == document.count("</picture>") == 2
