@@ -262,7 +262,7 @@ def test_provenance_or_schema_cannot_be_trusted_from_labels(measured, registered
 def test_freshness_and_byte_identical_chart_rerender(measured, rendered):
     report.persist(rendered, check=True)
     chart = report.timeline(measured)
-    assert report.chart_bytes(chart, measured) == rendered["docs/retry-storm.svg"]
+    assert report.chart_bytes(chart, measured) == rendered["docs/retry-storm-light.svg"]
     for config, trace in chart["traces"].items():
         runs = measured["cells"]["S2/" + config]["runs"]
         primary = measured["frozen_decision"]["metrics"]["S2"]["primary"]
@@ -291,7 +291,7 @@ def test_readme_case_study_tracks_saved_measurements(measured, rendered):
     changed["cells"]["S3/C4"]["summary"]["duplicate_provider_executions"].update(median=7, min=7, max=7)
     assert "90 → 7 duplicate executions per run" in report.readme_highlights(changed)
     assert "7 [7, 7]" in report.readme_results(changed)
-    for target in ("docs/results.md", "docs/chart_data.json", "docs/engineering-log.md", "docs/retry-storm.svg"):
+    for target in ("docs/results.md", "docs/chart_data.json", "docs/engineering-log.md", "docs/retry-storm-light.svg"):
         assert target in text and (analysis.ROOT / target).is_file()
 
 
@@ -321,8 +321,10 @@ def test_reader_and_failed_cli_are_readonly(monkeypatch, capsys):
 
 
 def test_both_svgs_are_deterministic_accessible_and_zero_based(measured, rendered):
-    pairs = [(charts.chart_bytes(report.timeline(measured), measured), "docs/retry-storm.svg"),
-             (charts.ladder_bytes(measured), "docs/mechanism-ladder.svg")]
+    pairs = [(raw, f"docs/{name}-{theme}.svg") for theme in charts.THEMES
+             for name, raw in (("retry-storm", charts.chart_bytes(report.timeline(measured), measured, theme)),
+                               ("protection-ladder", charts.ladder_bytes(measured, theme)))]
+    assert {path for _, path in pairs} == set(report.SVG_NAMES) and len(pairs) == 4
     for raw, path in pairs:
         assert raw == rendered[path]
         svg = ElementTree.fromstring(raw)
@@ -332,19 +334,19 @@ def test_both_svgs_are_deterministic_accessible_and_zero_based(measured, rendere
         identifiers = {element.attrib["id"] for element in svg.iter() if "id" in element.attrib}
         assert all(value[5:-1] in identifiers for element in svg.iter()
                    if (value := element.attrib.get("clip-path", "")).startswith("url(#"))
-        assert b"<text" in raw and b"HARMFUL" in rendered["docs/mechanism-ladder.svg"]
+        assert b"<path" in raw and b"<text" not in raw and b"HARMFUL" in rendered["docs/protection-ladder-light.svg"]
     for fig in (charts.figure(report.timeline(measured), measured), charts.ladder_figure(measured)):
         assert all(ax.get_ylim()[0] == 0 for ax in fig.axes)
 
 
 def test_ladder_shows_actual_goal_and_safety_values(measured):
     fig = charts.ladder_figure(measured)
-    assert len(fig.axes) == 9
+    assert len(fig.axes) == 6
     for row, (scenario, metrics, _) in enumerate(charts.PANELS):
         for col, metric in enumerate(metrics):
             scale = 100 if metric.endswith("success_fraction") else 1
             expected = [measured["cells"][f"{scenario}/C{i}"]["summary"][metric]["median"] * scale for i in range(5)]
-            ax = fig.axes[row*3+col]
+            ax = fig.axes[row*2+col]
             dots = [line for line in ax.lines if line.get_marker() == "o"]
             assert [line.get_ydata()[0] for line in dots] == expected
             assert [text.get_text() for text in ax.texts] == [f"{value:.3g}" for value in expected]
@@ -370,7 +372,7 @@ def test_outage_costs_and_all_scientific_fields_preserved(measured, rendered):
     assert "round 2 took 11 seconds, exceeding its 10-second limit" in text
     assert "success 89.3% → 66.5%" in charts.cost_caption(measured)
     assert "C4 fail-fast outcomes 200 per 600 jobs" in charts.cost_caption(measured)
-    assert "I did not implement or test any fallback" in text
+    assert "No fallback was implemented or tested" in text
     derived = json.loads(rendered["docs/chart_data.json"])
     assert derived.pop("timeline") == report.timeline(measured)
     sources = derived.pop("analysis_sources")
@@ -378,3 +380,47 @@ def test_outage_costs_and_all_scientific_fields_preserved(measured, rendered):
     assert derived == measured
     primary = measured["cells"]["S1/C0"]["summary"]["attempts_per_logical_request"]["median"]
     assert str(primary) in rendered["docs/results.md"].decode()
+
+
+@pytest.mark.parametrize("changes,label,amount", [([.1], "MARGINAL", "0.1%"), ([90], "CLEAR", "90.0%"),
+    ([.1, 90], "CLEAR", "90.0%"), ([4.96], "CLEAR", "5.0%")])
+def test_harm_strength_uses_every_failure_and_rounded_changes(changes, label, amount):
+    comparison = dict(verdict="HARMFUL", guardrails=[dict(name="latency_p99_seconds", round=i+1,
+        baseline=100, candidate=100*(1+delta/100), passed=False) for i, delta in enumerate(changes)])
+    before = deepcopy(comparison)
+    text = charts.strength(comparison)
+    assert text.startswith(label + " — p99 latency (seconds), round " + str(changes.index(max(changes))+1))
+    assert "100 → " in text and "increased " + amount in text
+    assert comparison == before and comparison["verdict"] == "HARMFUL"
+
+
+def test_saved_boundary_and_every_harmful_step_are_explained(measured, rendered):
+    boundary = next(c for c in measured["comparisons"] if c["scenario"] == "S2" and
+                    c["role"] == "stepwise" and c["baseline"] == "C3" and c["candidate"] == "C4")
+    g = next(g for g in boundary["guardrails"] if g["name"] == "outside_outage_success_fraction" and g["round"] == 3)
+    assert (g["baseline"]-g["candidate"])/g["baseline"]*100 == 4.9999999999999964
+    assert charts.strength(boundary).startswith("CLEAR — outside-outage success, round 3:")
+    assert "decreased 5.0%" in charts.strength(boundary)
+    for c in measured["comparisons"]:
+        if c["role"] == "stepwise" and c["verdict"] == "HARMFUL":
+            assert charts.strength(c) in rendered["README.md"].decode()
+            assert charts.strength(c, precision="") in rendered["docs/results.md"].decode()
+
+
+def test_case_study_order_theme_embeds_and_professional_voice(rendered):
+    text = rendered["README.md"].decode()
+    headings = [line[3:] for line in text.splitlines() if line.startswith("## ")]
+    assert headings == ["Findings", "Outage: fewer calls, more failed requests", "Essential terms",
+        "Results across four failure conditions", "How the protection ladder performed", "Three practical lessons",
+        "Problem and architecture", "C0–C4 protections", "Stepwise verdict strength", "Failures and recovery",
+        "Limitations", "Reproduction", "Testing, tools and provenance"]
+    assert not any(word in text for word in ("I stopped", "I added", "I measured", "I used"))
+    assert "VS Code Codex, GPT-6.1 Sol" in text and "No AI model generated benchmark responses" in text
+    terms = text.split("## Essential terms\n\n", 1)[1].split("\n\n##", 1)[0]
+    assert len(terms.splitlines()) == 6
+    for path in ("README.md", "docs/results.md"):
+        document = rendered[path].decode()
+        assert document.count("<picture>") == document.count("</picture>") == 2
+        assert document.count('media="(prefers-color-scheme: dark)"') == 2
+        assert document.count('<img src=') == document.count('alt="') == 2
+        assert "retry-storm.svg" not in document and "mechanism-ladder.svg" not in document

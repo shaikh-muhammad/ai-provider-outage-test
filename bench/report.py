@@ -9,7 +9,8 @@ from bench import analysis, charts
 
 ROOT = analysis.ROOT
 os.environ.setdefault("MPLCONFIGDIR", str(ROOT / "tmp/matplotlib"))
-OUTPUTS = ("README.md", "docs/results.md", "docs/chart_data.json", "docs/retry-storm.svg", "docs/mechanism-ladder.svg")
+SVG_NAMES = tuple(f"docs/{name}-{theme}.svg" for name in ("retry-storm", "protection-ladder") for theme in charts.THEMES)
+OUTPUTS = ("README.md", "docs/results.md", "docs/chart_data.json", *SVG_NAMES)
 
 
 def fmt(summary, precision=""):
@@ -89,10 +90,11 @@ chart_bytes = charts.chart_bytes
 
 def results(data):
     parts = ["# G9: official simulator results",
-        "I measured successful requests as well as calls reaching a local simulated provider. Fewer calls can mean failed requests. "
+        "The full protection stack eliminated duplicate work after lost replies, but failed the registered safety checks during rate limits and outages. "
+        "Successful requests matter alongside calls reaching the local simulated provider. Fewer calls can mean failed requests. "
         "The registered safety checks therefore decide whether a protection helped: C4 is HARMFUL in S1/S2 and EFFECTIVE in S3. "
         "These are three-run simulator observations, not real-provider guarantees.\n\n"
-        "[Outage timeline](retry-storm.svg) · [S1–S3 goals and safety checks](mechanism-ladder.svg) · "
+        "[Outage timeline](#retry-timeline) · [S1–S3 goals and safety checks](#mechanism-ladder) · "
         "[Readable case study](../README.md). Technical tables retain unrounded numeric values; "
         "[chart_data.json](chart_data.json) preserves per-run values, input hashes, formulas and verdicts.",
         findings(data), tradeoffs(data),
@@ -101,7 +103,9 @@ def results(data):
         "Ranges describe these three seeds and host scheduling, not confidence intervals or isolated environmental noise. "
         "Small n=3 limits precision. Full precision, per-round values, source paths/SHA-256 hashes and formulas are in [chart_data.json](chart_data.json).",
         "## Per-cell measurements\n\nSuccess is a fraction of all planned jobs (440 in S1, 600 otherwise). Latencies include failures and are seconds. "
-        "Each scenario's primary metric and units are frozen in `bench/thresholds.yaml`."]
+        "Each scenario's primary metric (goal measurement) and units are frozen in `bench/thresholds.yaml`. "
+        "Success fraction means successful jobs divided by planned jobs; p50/p95/p99 are percentile times to a final outcome. "
+        "Loop and launch lag measure delays in the event loop and request scheduling."]
     columns = ("success_fraction", "latency_p50_seconds", "latency_p95_seconds", "latency_p99_seconds")
     parts.append(table(["Cell", "Registered primary", "Success fraction", "p50 s", "p95 s", "p99 s"],
         [[name, fmt(cell["summary"][data["frozen_decision"]["metrics"][name[:2]]["primary"]]),
@@ -130,9 +134,10 @@ def results(data):
           "null" if c["I"] is None else str(c["I"]), "null" if c["S"] is None else str(c["S"]),
           "; ".join(f'{g["name"]} ({g["round"] or "median"})' for g in c["guardrails"] if g["passed"] is False) or "none"]
          for c in data["comparisons"]]))
-    parts += ["## Mechanism ladder", "![S1–S3 goals and safety checks across C0–C4, medians and three-run ranges](mechanism-ladder.svg)", ladder(data), "*S0 C4 compares with C0; C1–C3 are not registered for S0. "
+    parts += ["## Verdict strength", strength_table(data, precision=""), STRENGTH_NOTE,
+              "## Mechanism ladder", picture("protection-ladder", LADDER_ALT), ladder(data), "*S0 C4 compares with C0; C1–C3 are not registered for S0. "
               "Each step inherits earlier protections; effects cannot be attributed to isolated mechanisms without further experiments.",
-              "## Retry timeline", "![Provider attempts per second during S2, C0 versus C4 with three-run ranges](retry-storm.svg)",
+              "## Retry timeline", picture("retry-storm", HERO_ALT),
               "Lines select each config's median registered S2 primary run; ties use the earliest round. "
               "Representatives may use different rounds; paired verdicts still use all three matching rounds. "
               "Bands show per-second min–max across all three runs. The complete receipt-arrival horizon is shown, with a zero-based y axis. "
@@ -142,10 +147,11 @@ def results(data):
               "No qualifying window returns null; future completions and empty windows cannot establish recovery. "
               "Finite baseline and missing candidate recovery is harmful; missing baseline recovery is inconclusive unless another guard demonstrates harm.",
               "51 VALID results in 17 cells; 53 attempts across 51 slots. All 55 official artifacts reconcile with the COMPLETE manifest. "
-              "Slot 30 S3/C4 round 2 preserves ABANDONED attempt 1 and VALID attempt 2 under the approved "
+              "Slot 30 S3/C4 round 2 preserves ABANDONED attempt 1 and VALID attempt 2 under the recorded "
               "[shutdown recovery decision](recovery-decision-20261105.md). Slot 46 S3/C2 round 3 preserves INVALID attempt 1 "
               "(loop p99 107.938 ms; launch p99 107.356 ms, above 35/50 ms) and VALID attempt 2. Excluded attempts never enter statistics. "
-              "Slots 1–29 keep original runner provenance; subsequent attempts use the approved recovery runner. "
+              "Slots 1–29 keep original runner provenance; subsequent attempts use the recorded recovery runner. "
+              "Original registration/recovery approval locations are unknown; authenticated approval history is NOT VERIFIED. "
               "The empty reservation has no receipts or historical capture-time hash anchor; the exception does not recover the lost execution.",
               "## Limits and reproduction", "This is a simulated provider on loopback, on a single shared machine, with only three runs per cell "
               "and limited fault/load profiles. Seeded policies do not guarantee identical arrival-dependent faults. "
@@ -173,8 +179,10 @@ def readme_highlights(data):
     def pair(scenario, metric):
         values = [data["cells"][scenario + "/" + c]["summary"][metric]["median"] for c in ("C0", "C4")]
         return " → ".join(f"{value:.3g}" for value in values)
-    return (f'**Lost replies: {pair("S3", "duplicate_provider_executions")} duplicate executions per run. '
-            f'Rate-limit burst: {pair("S1", "latency_p99_seconds")} seconds p99 latency.**')
+    return (f'- **Lost replies: {pair("S3", "duplicate_provider_executions")} duplicate executions per run.**\n'
+            f'- **Rate-limit burst: {pair("S1", "latency_p99_seconds")} seconds p99 latency.**\n'
+            f'- **Outage success: {100*data["cells"]["S2/C0"]["summary"]["success_fraction"]["median"]:.3g}% → '
+            f'{100*data["cells"]["S2/C4"]["summary"]["success_fraction"]["median"]:.3g}%.**')
 
 
 def readme_outage(data):
@@ -197,31 +205,71 @@ def readme_outage(data):
             f'{recovery["candidate"]:.3g} seconds, exceeding its {recovery["limit"]:.3g}-second limit.')
 
 
+HERO_ALT = "S2 outage: blue C0 and dashed orange C4 provider calls, shaded 20–35 second outage and three-round ranges; fewer calls came with lower success and slower recovery."
+LADDER_ALT = "Six panels compare C0–C4 goals and safety: S1 attempts and p99 latency, S2 outage calls and outside-outage success, S3 duplicate executions and extra attempts; ranges and registered verdicts are shown."
+STRENGTH_NOTE = ("MARGINAL means every failing safety check worsened by less than 5.0% after rounding its relative change to one decimal percentage point; otherwise CLEAR. "
+                 "The worst failing paired-round check is shown. A relative decrease in success is not a percentage-point decrease. "
+                 "These descriptions do not change HARMFUL or any registered threshold. EFFECTIVE, NO MEASURABLE EFFECT and INCONCLUSIVE retain their registered meanings.")
+
+
+def picture(name, alt, prefix=""):
+    return (f'<picture>\n<source media="(prefers-color-scheme: dark)" srcset="{prefix}{name}-dark.svg">\n'
+            f'<source media="(prefers-color-scheme: light)" srcset="{prefix}{name}-light.svg">\n'
+            f'<img src="{prefix}{name}-light.svg" alt="{alt}" width="100%">\n</picture>')
+
+
+def strength_table(data, precision=".3g"):
+    return table(["Scenario", "Protection step", "Registered verdict", "Worst failing safety check and size"],
+        [[c["scenario"], c["baseline"] + " → " + c["candidate"], c["verdict"], charts.strength(c, precision)]
+         for c in data["comparisons"] if c["role"] == "stepwise"])
+
+
 README = """# AI Provider Outage Test
 
-I stopped duplicate work after lost replies, but the same protection stack made my rate-limit and outage results worse. I measured both the calls reaching my simulated provider and the requests that actually succeeded.
+## Findings
 
-The figures compare my baseline with the full protection stack. **p99 latency** is the 99th-percentile time to a final outcome, including failures.
+Retry protections can prevent duplicate work while making other failures worse. In this local simulator, the full stack eliminated repeated execution after lost replies, but reduced successful work during an outage and increased delay during a rate-limit burst. Lower provider traffic alone did not establish a better service.
 
 {highlights}
 
-This is a local simulation on **127.0.0.1**, not a test of a commercial AI API. One planned job is a **request**; it can make several network **attempts**. **C0** is my baseline retry policy. **C4** includes all four protections below.
+[Detailed measurements](docs/results.md) · [Source data](docs/chart_data.json) · [Engineering log](docs/engineering-log.md) · [Reproduce](#reproduction)
 
-[Detailed measurements](docs/results.md) · [Source data](docs/chart_data.json) · [Engineering log](docs/engineering-log.md) · [Reproduce](#reproduce-the-work)
+## Outage: fewer calls, more failed requests
 
-## What I observed
+{hero}
 
-A **guardrail** is a safety condition that must pass alongside a lower call count. I fixed these rules before capture; HARMFUL takes precedence when a safety check fails. The **median** is the middle of three run values; brackets show the minimum and maximum.
+Lines use each configuration's median outage-call metric run: C0 round {c0_round} and C4 round {c4_round}. They are not a matched pair. Bands show per-second min–max across all three rounds. Zero means no calls reached the provider, not that requests succeeded. Recovery summaries describe all three runs, not events on the representative lines.
+
+## Essential terms
+
+**Request:** one planned job; an **attempt** is one network call made for that job.<br>
+**C0:** baseline retries; **C4:** the complete, cumulative protection stack.<br>
+**p99 latency:** the 99th-percentile time to a final outcome, including failures.<br>
+**Median and range:** the middle run value, followed by [minimum, maximum].<br>
+**Guardrail:** a safety check that must pass alongside an improved goal metric.<br>
+**Recovery:** the first registered five-second window reaching 95% success after the outage; an empty window cannot qualify.
+
+## Results across four failure conditions
 
 {results_table}
 
-Values are median [minimum, maximum] across three valid runs, rounded for reading. † flags more than 10% relative spread. The detailed report retains numeric precision. S0 is a healthy control, not an efficacy win.
+S0 is healthy service; S1 is a rate-limit burst; S2 combines errors and hung calls during 20–35 seconds; S3 loses replies after work finishes. Values are median [minimum, maximum] across three VALID runs, rounded to 2–3 significant figures. † flags more than 10% relative spread. The detailed report retains full precision. S0 is a control, not an efficacy win.
 
-## Why I built it
+## How the protection ladder performed
 
-Retries can repeat useful work after a lost reply or add pressure during a failure. I wanted to see when deadlines, randomized retry waits, temporary call rejection and reusable job keys helped—and what successful work they cost.
+{ladder_chart}
 
-## How it works
+Dots show medians and whiskers min–max across three runs. All numeric axes start at zero. Each step inherits earlier protections; the comparisons do not isolate individual mechanisms. Words and icons identify the registered verdicts; the table below explains the size of failing checks.
+
+## Three practical lessons
+
+- **Judge successful work, not traffic alone.** S1's worse p99 latency defeats its lower attempt count. S3 shows the useful case: stable job keys eliminate duplicate execution while preserving success.
+- **Read outage costs alongside load reduction.** {outage}
+- **Fast failure needs a product decision.** A failure without further retries can protect capacity, but it is not a successful fallback. A production caller would need an explicit policy, such as a bounded queue, a clearly signalled unavailable response or an alternate service with separate safety and cost checks. **No fallback was implemented or tested.**
+
+## Problem and architecture
+
+A lost reply can hide completed work, so retrying may execute it twice. During service failures, retries can also add load and delay the caller. This project measures both effects using a local simulated provider on **127.0.0.1**.
 
 ```mermaid
 flowchart LR
@@ -235,22 +283,11 @@ flowchart LR
     E --> A["Read-only analysis and charts"]
 ```
 
-I reconcile client outcomes with the provider's **ledger**, its record of received calls and executed jobs. A received retry is not necessarily new execution. The separate admin interface requires a per-run token; bodies, concurrency and run time are bounded.
+Client outcomes reconcile with the provider's **ledger**, its record of received calls and executed jobs. A received retry is not necessarily a new execution. The separate admin interface requires a per-run token; bodies, concurrency and run time are bounded.
 
-## What I tested
+The registered design has **{cells} cells**, three paired runs per cell and workload/failure seeds **{seed_min}–{seed_max}**. S0 uses C0/C4; S1–S3 use C0–C4. Configurations share workload seeds and failure parameters within each round. Requests are never pooled across rounds. An EFFECTIVE result requires at least 20% improvement, larger than the baseline's observed relative range, with every safety check passing. The [registration](bench/thresholds.yaml) defines denominators, limits and verdicts.
 
-I registered **17 cells**, with three paired runs per cell and workload/failure seeds **12001–12003**. S0 uses C0/C4; S1–S3 use C0–C4. Configurations share workload seeds and failure parameters within a round. Arrival-dependent rate limiting can still vary with timing.
-
-| Scenario | Condition | Goal metric |
-| --- | --- | --- |
-| S0 | Healthy service | Extra provider attempts per planned request |
-| S1 | Burst against a rate limit | Client attempts per planned request |
-| S2 | Errors and hung calls during 20–35 s | Provider calls during the outage per planned outage request |
-| S3 | Replies lost after work finishes | Duplicate provider executions per run |
-
-I compare paired runs without pooling requests. An EFFECTIVE result needs at least 20% improvement, larger than the baseline's observed relative range, and every safety check passing. The [registration](bench/thresholds.yaml) defines denominators, limits and verdicts.
-
-## The protections I added
+## C0–C4 protections
 
 | Configuration | Added protection | Meaning here |
 | --- | --- | --- |
@@ -260,47 +297,31 @@ I compare paired runs without pooling requests. An EFFECTIVE result needs at lea
 | C3 | Circuit breaker | Temporarily reject calls locally after enough relevant failures, then admit a probe |
 | C4 | Idempotency key | Reuse a stable job key to replay a completed result without executing again |
 
-Each step inherits earlier protections. These comparisons do not isolate a mechanism from interactions with the rest of the stack.
+## Stepwise verdict strength
 
-## What each step changed
+{strength_table}
 
-![S2 provider calls per second: C0 baseline and C4 protections, shaded 20–35 s outage and three-run ranges](docs/retry-storm.svg)
-
-Lines use each configuration's median registered outage-call metric run: C0 round 1 and C4 round 2. They are not a matched pair. Bands show per-second min–max across all three runs, not confidence intervals. Zero means no calls reached the provider, not that requests succeeded.
-
-{outage}
-
-![S1 rate-limit, S2 outage and S3 lost-reply goals and safety metrics across C0–C4, with paired-round failure labels](docs/mechanism-ladder.svg)
-
-Dots are three-run medians; whiskers show min–max. Each scenario shows its goal and decisive safety checks; axes start at zero. Words and icons identify harm [!], effectiveness [+] or no measurable effect [=]. Labels report failed paired rounds even when rounded values look equal. [All comparisons](docs/results.md#paired-decisions) retain full inputs.
-
-## What I learned
-
-I would reject the full stack for these S1/S2 workloads under my registered rules. S1's worse p99 latency defeats the lower attempt count. In S2, fewer calls come with fewer successful jobs and slower recovery. In S3, C4 eliminates duplicate execution in every run while preserving success.
-
-A production caller would need an explicit fallback policy: for example, a bounded queue, a clearly signalled unavailable response or an alternate service with separate safety and cost checks. **I did not implement or test any fallback.** Fast failure alone does not supply one.
+{strength_note}
 
 ## Failures and recovery
 
-I preserved one health-invalid S3/C2 attempt and its valid retry. A shutdown left a zero-byte reservation with no receipts. The [recovery decision](docs/recovery-decision-20261105.md) retains it as ABANDONED attempt 1 and counts later attempts against the original cap.
+One health-invalid S3/C2 attempt and its valid retry remain preserved. A shutdown left a zero-byte reservation with no receipts. The [recovery decision](docs/recovery-decision-20261105.md) retains it as ABANDONED attempt 1 and counts later attempts against the original cap. The shutdown initiator remains unknown; the owner states, “I did not shut down the VM.” Original registration/recovery approval locations and original G1/G7 decision records are unavailable; authenticated approval history is **NOT VERIFIED**.
 
-The complete manifest accounts for **51 VALID runs, one INVALID and one ABANDONED attempt: 53 attempts and 55 official artifacts**. Excluded attempts never enter valid statistics. The [dated engineering log](docs/engineering-log.md) records setbacks and rationale. The lost run and historical capture-time integrity proof cannot be reconstructed.
+The complete manifest accounts for **{valid} VALID runs, {invalid} INVALID and {abandoned} ABANDONED attempt: {attempts} attempts and {artifacts} official artifacts**. Excluded attempts never enter valid statistics. The [dated engineering log](docs/engineering-log.md) preserves setbacks and retrospective rationale. The lost run and historical capture-time integrity proof cannot be reconstructed.
 
-## Limits of the evidence
+## Limitations
 
-This is a **simulated provider on one shared machine**, with **three runs per cell and limited fault/load profiles**. Ranges are descriptive, not confidence intervals or significance tests. Host scheduling and arrival-dependent rate limits affect outcomes.
+This is a **simulated provider on one shared machine**, with **three runs per cell and limited fault/load profiles**. Ranges are descriptive, not confidence intervals or significance tests. Host scheduling and arrival-dependent rate limits affect outcomes even with seeded policies.
 
-The simulator explicitly supports idempotency; that proves no real-service exactly-once guarantee. Executed work is a cost proxy, with no monetary pricing model. **These results may not transfer to real AI providers.** I claim neither production availability nor independent audit approval.
+The simulator explicitly supports idempotency; that proves no real-service exactly-once guarantee. Executed work is a cost proxy, with no monetary pricing model. **These results may not transfer to real AI providers.** They establish neither production availability nor independent audit approval.
 
-## Reproduce the work
+## Reproduction
 
-**Inspect:** read the [report](docs/results.md), [chart data](docs/chart_data.json), [registration](bench/registration.lock.json) and [official artifacts](results/official/). No capture is needed.
+1. **Inspect:** read the [report](docs/results.md), [chart data](docs/chart_data.json), [registration](bench/registration.lock.json) and [official artifacts](results/official/). No capture is needed.
+2. **Recompute:** use a full clone and Python 3.14. Run `source scripts/env.sh`; verify `which python` points into this project's `.venv`. Install locked binary wheels with `python -m pip install --only-binary=:all: -r requirements-dev.lock`. Run `PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m bench.report --check` to reconcile saved evidence and verify derivatives. Omitting `--check` regenerates them without launching a provider.
+3. **Reproduce an experiment:** agree separate capture authorization and a fresh destination under [AGENTS.md](AGENTS.md). Preserve registered workloads, seeds, failure schedules and existing official files. These instructions do not authorize overwriting evidence or calling a real provider.
 
-**Recompute:** use a full clone and Python 3.14. Activate with `source scripts/env.sh`; verify `which python` points into this project's `.venv`. For a new environment, install locked binary wheels with `python -m pip install --only-binary=:all: -r requirements-dev.lock`. Run `PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m bench.report --check` to reconcile saved evidence and verify derivatives. Omitting `--check` regenerates them without launching a provider.
-
-**Reproduce an experiment:** first agree separate capture authorization and a fresh destination under [AGENTS.md](AGENTS.md). Preserve registered workloads, seeds and failure schedules and existing official files. These instructions do not authorize overwriting evidence or calling a real provider.
-
-## Testing
+## Testing, tools and provenance
 
 ```sh
 source scripts/env.sh
@@ -311,24 +332,27 @@ python -m pip check
 
 Tests independently recompute metrics and decisions, check negative and tamper cases, enforce security patterns, and verify deterministic charts and freshness. These checks launch no experiments.
 
-## Provenance, tools and licence
+The manifest preserves original and recovery runner identities. Source paths, SHA-256 hashes, formulas and full-precision measurements are in the chart data. [bench/report.py](bench/report.py) generates this README; [bench/charts.py](bench/charts.py) renders the charts.
 
-The manifest preserves original and recovery runner identities. Source paths, SHA256 hashes, formulas and full-precision measurements are in the chart data. [bench/report.py](bench/report.py) generates this README; [bench/charts.py](bench/charts.py) renders the charts.
-
-I used Codex with GPT-6.1 Sol for code, analysis and documentation, plus Python and locked Matplotlib. No AI model supplied benchmark responses. AI assistance and automated checks do not replace independent review. Project materials use the [MIT licence](LICENSE); dependencies retain their own licences.
-
-## Terms used here
-
-A **paired round** uses matching workload/failure seeds across configurations. **Recovery** is the first registered five-second window meeting the 95% success condition, checked at whole seconds after the outage. An empty window cannot establish recovery; no qualifying observation is recorded as missing.
+Tools: **VS Code Codex, GPT-6.1 Sol**, Python and locked Matplotlib. **No AI model generated benchmark responses.** AI assistance and automated checks do not replace independent review. Project materials use the [MIT licence](LICENSE); dependencies retain their own licences.
 """
 
 
 def render(data):
     data = dict(data, timeline=timeline(data), analysis_sources={name: analysis.official.digest(analysis.read(ROOT / name))
                      for name in ("bench/analysis.py", "bench/report.py", "bench/charts.py")})
-    return dict(zip(OUTPUTS, [README.format(highlights=readme_highlights(data), results_table=readme_results(data),
-        outage=readme_outage(data)).encode(), results(data).encode(),
-        (json.dumps(data, sort_keys=True, indent=2, allow_nan=False) + "\n").encode(), chart_bytes(data["timeline"], data), charts.ladder_bytes(data)], strict=True))
+    text = README.format(highlights=readme_highlights(data), results_table=readme_results(data), outage=readme_outage(data),
+        hero=picture("retry-storm", HERO_ALT, "docs/"), ladder_chart=picture("protection-ladder", LADDER_ALT, "docs/"),
+        strength_table=strength_table(data), strength_note=STRENGTH_NOTE, cells=len(data["cells"]),
+        seed_min=min(r["seed"] for c in data["cells"].values() for r in c["runs"]),
+        seed_max=max(r["seed"] for c in data["cells"].values() for r in c["runs"]),
+        c0_round=data["timeline"]["traces"]["C0"]["round"], c4_round=data["timeline"]["traces"]["C4"]["round"],
+        valid=data["valid_runs"], invalid=sum(r["status"] == "INVALID" for r in data["excluded"]),
+        abandoned=sum(r["status"] == "ABANDONED" for r in data["excluded"]), attempts=data["total_attempts"], artifacts=len(data["inputs"]))
+    images = [chart_bytes(data["timeline"], data, theme) for theme in charts.THEMES] + [charts.ladder_bytes(data, theme) for theme in charts.THEMES]
+    return dict(zip(OUTPUTS, [text.encode(), results(data).encode(),
+        (json.dumps(data, sort_keys=True, indent=2, allow_nan=False) + "\n").encode(), *images], strict=True))
+
 
 
 def persist(outputs, *, check, root=ROOT):

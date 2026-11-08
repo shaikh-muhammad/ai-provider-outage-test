@@ -138,3 +138,41 @@ The scientific chart JSON is field-for-field identical to the baseline after rem
 Both SVGs rerender byte-identically, use zero-based axes and valid clipping references, and have accessible title/description text. Rendered text bounds fit their canvases. Desktop and 440-pixel narrow PNGs are local review artifacts, never committed. The README screenshot uses a local Markdown approximation with Mermaid displayed as source; exact GitHub Mermaid styling still needs owner review. The ladder intentionally carries nine panels and paired-round details, so narrow-view density also needs visual approval.
 
 All eight A2 gaps are addressed in this execution; unavailable actual owner hours and undocumented G0/G1/G5 acceptance dates remain explicitly NOT VERIFIED, not filled with estimates. No experiments, new dependencies, branch creation, commit, push, PR or merge occurred. Parts B/C and existing audit logs were not changed. Stop for owner visual approval; Part A has one reserved execution remaining.
+
+## 2026-11-08 UTC (November 7 America/New_York) — Master v2.0 E3, execution #54
+
+**G-3 status: BEHIND.** This is an additive retrospective update; earlier dated entries and their execution-specific budgets remain historical records. The original owner-supplied calendar plan was November 1 G0–G2; November 2 G3/start G4; November 3 finish G4, G5–G7/start G8; November 4 finish G8/G9/G10; November 5 hard-cap reserve only. The original budget was **12–15 Codex executions, a four-day target, five-day maximum and 12–20 focused owner hours**. These targets are not measured owner effort.
+
+The following are local Git committer timestamps, normalized to UTC from the recorded offsets. They establish code or evidence publication, not undocumented owner acceptance. PR numbers come from merge subjects; PR #10 is the existing owner-identified presentation PR, whose head commit is recorded below. Its creation/acceptance date and live hosted status are not inferred from that commit.
+
+| Gate / PR milestone | Supported UTC publication time | Git record / qualification |
+| --- | --- | --- |
+| G0 scaffold | 2026-11-02 00:38:44Z | 2c6427e; complete G0 acceptance NOT VERIFIED |
+| G1 plan | NOT VERIFIED | No separate contemporaneous plan acceptance record located |
+| G2 provider / PR #1 | 2026-11-02 03:06:33Z | Merge 46f3d2a |
+| G3 clients / PR #2 | 2026-11-02 03:53:03Z | Merge af1ed8c |
+| G4 harness / PR #3 | 2026-11-02 06:39:36Z | Merge f1d3d38 |
+| G5 CI present | 2026-11-02 02:47:56Z | e0516fe; separate G5 acceptance NOT VERIFIED |
+| G6 pilot publication / PR #4 | 2026-11-02 21:50:58Z | Merge 8cd6d67 |
+| G7 registration freeze | 2026-11-02 21:37:55Z | ba0dc87; original approval location NOT VERIFIED |
+| G8 runner / PR #5 | 2026-11-03 04:48:42Z | Merge f2260d1; not a capture-completion date |
+| G8 recovery / PR #6 | 2026-11-05 23:36:59Z | Merge e4e2edd; original recovery approval location NOT VERIFIED |
+| G8 official evidence / PR #7 | 2026-11-06 00:41:20Z | Merge d7cd611; publication of preserved evidence |
+| G9 analysis / PR #8 | 2026-11-06 06:49:19Z | Merge 34bc520 |
+| G10 handoff | NOT VERIFIED as a Git acceptance milestone | Existing execution #48 self-assessment records November 7 UTC; independent acceptance NOT VERIFIED |
+| README publication / PR #9 | 2026-11-07 04:20:21Z | Merge 4ab102d |
+| Existing PR #10 head | 2026-11-07 07:07:35Z | 3723b38; E2/E3 working-tree changes remain uncommitted |
+
+The owner-supplied historical count before Master v2.0 is **51 executions**. E1 is #52, E2 #53 and this E3 #54: **54 including E3, 39–42 above the original 12–15 target**. The November 4 target and November 5 hard cap have been exceeded. **Owner working hours: NOT VERIFIED**; benchmark/CI durations and elapsed calendar time are not substitutes. Original G1/G7 decision records and authenticated registration/recovery approvals remain NOT VERIFIED. The owner states, “I did not shut down the VM”; the shutdown initiator remains unknown.
+
+The separate Master v2.0 allowance is five execution slots, E1–E5, with E4 conditional on necessary fixes. E3 uses **three of five slots**. This entry does not start E4/E5 or authorize Git writes, experiments or new scope. The earlier Part A budget is not reused as a new authorization.
+
+**G-4 implementation:** the existing pytest scanner now covers every `.py` and `.sh` file under `src`, `tests`, `bench` and `scripts`. It still extracts the exact prohibited-call regex from unchanged original CI; no second scanner or regex copy was added. Assertions require all four roots and both suffixes. Existing fabricated prohibited cases are retained, with additional whitespace cases. Constructed safe examples cover `asyncio.create_subprocess_exec`, a false shell option, safe YAML parsing and a harmless identifier; pattern fragments avoid self-matches. Existing credential and S3 negative-case assertions remain intact.
+
+**G-1/G-2 review:** execution #50 already labels the C0 numeric and HTTP 429 rationale retrospective, not contemporaneous approval. Its simplification/reversion history remains intact. No missing approval is authenticated by this update. E2 left `bench/charts.py` at 187 lines and `bench/report.py` at 387, within 250/392 limits; `tests/test_report.py` is 426 lines, with 54 additions against its reviewed baseline. The existing `results()` function is now 72 lines at line 91, superseding the execution #50 size count of 67; no explicit size waiver is claimed. Other inherited size deviations remain as previously disclosed. Safe shortening could remove the unused report `Path` import; no evidence or assertion needs deletion.
+
+**G-5 through G-9 review:** the existing tracked-file credential scan includes all four replacement SVGs before staging and after owner staging, and asserts obsolete SVGs are absent. The S3 zero-duplicate-baseline cases remain unchanged. E2's six-panel S1/S2/S3 ladder and four light/dark SVGs, objective README, full-precision report and strength annotations are preserved. All seven stepwise HARMFUL comparisons remain HARMFUL: four MARGINAL and three CLEAR. The S2 C3→C4 success decrease is 4.9999999999999964% before rounding, displayed 5.0% and CLEAR. Its boundary and synthetic 0.1%, 90% and mixed-failure tests remain in place. No scientific input or verdict is changed. Narrow annotation density still needs owner visual review; approval is not claimed.
+
+Only the engineering log and existing finish-line test are changed in E3; no `test_hygiene.py` is needed. No full local suite or experiment is repeated. E2's prior full-suite result remains its historical result. E3 command transcripts and actual focused/freshness/protection results are recorded separately under `logs/execution54/`; final results are appended after validation.
+
+**E3 validation:** focused `tests/test_finishline.py tests/test_report.py` passed **80 tests in 40.60 s**, exit 0, with no skips. This includes the exact-CI forbidden-call scanner, fabricated prohibited/safe cases, tracked-file/four-SVG credential scan, S3 negative cases, all G9 labels and presentation checks. `bench.report --check` reported **G9 freshness PASS**, exit 0. The unchanged original-CI forbidden-call command passed, exit 0. A separate review verified all 13 recorded UTC Git timestamps, preservation of the existing pattern extractor/credential/S3 functions, additive log history and all seven G9 strength labels, exit 0. Raw command, stdout, stderr (including empty streams) and exit bundles are under `logs/execution54/`. Validation uses a temporary no-atime directory iterator; no frozen analyzer or tests are patched on disk. Protected hashes, official file/directory metadata and exact E3 scope are checked against `tmp/execution54/before.json` before handoff. Hosted CI has not been run for these uncommitted changes; the owner controls staging and the final committed-tree checks. No owner visual approval or independent audit acceptance is claimed.

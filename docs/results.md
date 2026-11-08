@@ -1,8 +1,8 @@
 # G9: official simulator results
 
-I measured successful requests as well as calls reaching a local simulated provider. Fewer calls can mean failed requests. The registered safety checks therefore decide whether a protection helped: C4 is HARMFUL in S1/S2 and EFFECTIVE in S3. These are three-run simulator observations, not real-provider guarantees.
+The full protection stack eliminated duplicate work after lost replies, but failed the registered safety checks during rate limits and outages. Successful requests matter alongside calls reaching the local simulated provider. Fewer calls can mean failed requests. The registered safety checks therefore decide whether a protection helped: C4 is HARMFUL in S1/S2 and EFFECTIVE in S3. These are three-run simulator observations, not real-provider guarantees.
 
-[Outage timeline](retry-storm.svg) · [S1–S3 goals and safety checks](mechanism-ladder.svg) · [Readable case study](../README.md). Technical tables retain unrounded numeric values; [chart_data.json](chart_data.json) preserves per-run values, input hashes, formulas and verdicts.
+[Outage timeline](#retry-timeline) · [S1–S3 goals and safety checks](#mechanism-ladder) · [Readable case study](../README.md). Technical tables retain unrounded numeric values; [chart_data.json](chart_data.json) preserves per-run values, input hashes, formulas and verdicts.
 
 - **S0: NO MEASURABLE EFFECT.** C0 0.0 [0.0, 0.0] → C4 0.0 [0.0, 0.0] extra provider attempts per planned request. All registered guardrails pass.
 - **S1: HARMFUL.** C0 1.2772727272727273 [1.240909090909091, 1.2772727272727273] → C4 1.2204545454545455 [1.2136363636363636, 1.259090909090909] attempts per planned request. Failed guardrails: 99th-percentile request latency.
@@ -17,7 +17,7 @@ Each entry is median [minimum, maximum] of three VALID per-run metrics; no pooli
 
 ## Per-cell measurements
 
-Success is a fraction of all planned jobs (440 in S1, 600 otherwise). Latencies include failures and are seconds. Each scenario's primary metric and units are frozen in `bench/thresholds.yaml`.
+Success is a fraction of all planned jobs (440 in S1, 600 otherwise). Latencies include failures and are seconds. Each scenario's primary metric (goal measurement) and units are frozen in `bench/thresholds.yaml`. Success fraction means successful jobs divided by planned jobs; p50/p95/p99 are percentile times to a final outcome. Loop and launch lag measure delays in the event loop and request scheduling.
 
 | Cell | Registered primary | Success fraction | p50 s | p95 s | p99 s |
 | --- | --- | --- | --- | --- | --- |
@@ -129,9 +129,32 @@ B=median(baseline), C=median(candidate), I=(B−C)/B, S=(max(baseline)−min(bas
 | S3 | stepwise | C2:C3 | NO MEASURABLE EFFECT | 0.0 | 0.17777777777777778 | none |
 | S3 | stepwise | C3:C4 | EFFECTIVE | 1.0 | 0.17777777777777778 | none |
 
+## Verdict strength
+
+| Scenario | Protection step | Registered verdict | Worst failing safety check and size |
+| --- | --- | --- | --- |
+| S1 | C0 → C1 | HARMFUL | MARGINAL — p99 latency (seconds), round 1: 1.5236279162849584 → 1.5511503894296226; increased 1.8% |
+| S1 | C1 → C2 | HARMFUL | CLEAR — p99 latency (seconds), round 2: 1.5328758675703824 → 3.104086965285596; increased 102.5% |
+| S1 | C2 → C3 | HARMFUL | MARGINAL — p99 latency (seconds), round 2: 3.104086965285596 → 3.1073466462834674; increased 0.1% |
+| S1 | C3 → C4 | HARMFUL | MARGINAL — p99 latency (seconds), round 2: 3.1073466462834674 → 3.1319440279994524; increased 0.8% |
+| S2 | C0 → C1 | NO MEASURABLE EFFECT | — |
+| S2 | C1 → C2 | HARMFUL | MARGINAL — p99 latency (seconds), round 2: 6.007473858003504 → 6.02167371199921; increased 0.2% |
+| S2 | C2 → C3 | HARMFUL | CLEAR — recovery (seconds), round 2: 5 → 11; increased 120.0% |
+| S2 | C3 → C4 | HARMFUL | CLEAR — outside-outage success, round 3: 93.33333333333333% → 88.66666666666667%; decreased 5.0% |
+| S3 | C0 → C1 | NO MEASURABLE EFFECT | — |
+| S3 | C1 → C2 | NO MEASURABLE EFFECT | — |
+| S3 | C2 → C3 | NO MEASURABLE EFFECT | — |
+| S3 | C3 → C4 | EFFECTIVE | — |
+
+MARGINAL means every failing safety check worsened by less than 5.0% after rounding its relative change to one decimal percentage point; otherwise CLEAR. The worst failing paired-round check is shown. A relative decrease in success is not a percentage-point decrease. These descriptions do not change HARMFUL or any registered threshold. EFFECTIVE, NO MEASURABLE EFFECT and INCONCLUSIVE retain their registered meanings.
+
 ## Mechanism ladder
 
-![S1–S3 goals and safety checks across C0–C4, medians and three-run ranges](mechanism-ladder.svg)
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="protection-ladder-dark.svg">
+<source media="(prefers-color-scheme: light)" srcset="protection-ladder-light.svg">
+<img src="protection-ladder-light.svg" alt="Six panels compare C0–C4 goals and safety: S1 attempts and p99 latency, S2 outage calls and outside-outage success, S3 duplicate executions and extra attempts; ranges and registered verdicts are shown." width="100%">
+</picture>
 
 | Scenario | C0 reference: primary median [min, max] | C1 vs C0 | C2 vs C1 | C3 vs C2 | C4 vs C3* |
 | --- | --- | --- | --- | --- | --- |
@@ -144,7 +167,11 @@ B=median(baseline), C=median(candidate), I=(B−C)/B, S=(max(baseline)−min(bas
 
 ## Retry timeline
 
-![Provider attempts per second during S2, C0 versus C4 with three-run ranges](retry-storm.svg)
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="retry-storm-dark.svg">
+<source media="(prefers-color-scheme: light)" srcset="retry-storm-light.svg">
+<img src="retry-storm-light.svg" alt="S2 outage: blue C0 and dashed orange C4 provider calls, shaded 20–35 second outage and three-round ranges; fewer calls came with lower success and slower recovery." width="100%">
+</picture>
 
 Lines select each config's median registered S2 primary run; ties use the earliest round. Representatives may use different rounds; paired verdicts still use all three matching rounds. Bands show per-second min–max across all three runs. The complete receipt-arrival horizon is shown, with a zero-based y axis. The shaded [20,35) second outage is registered; no traffic is rerun for this chart.
 
@@ -152,7 +179,7 @@ Lines select each config's median registered S2 primary run; ties use the earlie
 
 S2 checks whole seconds t=40..60. D counts all requests actually issued in [t−5,t); A counts those successful and completed by t. The earliest D>0 and 20A≥19D returns t−35 seconds. No qualifying window returns null; future completions and empty windows cannot establish recovery. Finite baseline and missing candidate recovery is harmful; missing baseline recovery is inconclusive unless another guard demonstrates harm.
 
-51 VALID results in 17 cells; 53 attempts across 51 slots. All 55 official artifacts reconcile with the COMPLETE manifest. Slot 30 S3/C4 round 2 preserves ABANDONED attempt 1 and VALID attempt 2 under the approved [shutdown recovery decision](recovery-decision-20261105.md). Slot 46 S3/C2 round 3 preserves INVALID attempt 1 (loop p99 107.938 ms; launch p99 107.356 ms, above 35/50 ms) and VALID attempt 2. Excluded attempts never enter statistics. Slots 1–29 keep original runner provenance; subsequent attempts use the approved recovery runner. The empty reservation has no receipts or historical capture-time hash anchor; the exception does not recover the lost execution.
+51 VALID results in 17 cells; 53 attempts across 51 slots. All 55 official artifacts reconcile with the COMPLETE manifest. Slot 30 S3/C4 round 2 preserves ABANDONED attempt 1 and VALID attempt 2 under the recorded [shutdown recovery decision](recovery-decision-20261105.md). Slot 46 S3/C2 round 3 preserves INVALID attempt 1 (loop p99 107.938 ms; launch p99 107.356 ms, above 35/50 ms) and VALID attempt 2. Excluded attempts never enter statistics. Slots 1–29 keep original runner provenance; subsequent attempts use the recorded recovery runner. Original registration/recovery approval locations are unknown; authenticated approval history is NOT VERIFIED. The empty reservation has no receipts or historical capture-time hash anchor; the exception does not recover the lost execution.
 
 ## Limits and reproduction
 

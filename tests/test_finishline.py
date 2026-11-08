@@ -21,16 +21,26 @@ def unsafe_pattern():
 
 def test_no_unsafe_calls_in_sources_bench_and_scripts():
     pattern = unsafe_pattern()
-    files = [p for name in ("src", "bench", "scripts") for p in (ROOT / name).rglob("*")
+    files = [p for name in ("src", "tests", "bench", "scripts") for p in (ROOT / name).rglob("*")
              if p.suffix in (".py", ".sh")]
     assert files
+    assert {p.relative_to(ROOT).parts[0] for p in files} == {"src", "tests", "bench", "scripts"}
+    assert {p.suffix for p in files} == {".py", ".sh"}
     assert not [p.relative_to(ROOT).as_posix() for p in files if re.search(pattern, analysis.read(p).decode())]
 
 
 @pytest.mark.parametrize("parts", [("ev", "al("), ("ex", "ec("), ("pi", "ckle"),
-    ("mar", "shal"), ("os.sys", "tem("), ("shell=", "True"), ("yaml.lo", "ad(")])
+    ("mar", "shal"), ("os.sys", "tem("), ("shell=", "True"), ("yaml.lo", "ad("),
+    ("shell ", "= ", "True"), ("os.sys", "tem", " (synthetic)")])
 def test_ci_pattern_detects_unsafe_constructs(parts):
     assert re.search(unsafe_pattern(), "".join(parts))
+
+
+@pytest.mark.parametrize("parts", [("asyncio.create_subprocess_", "ex", "ec('synthetic')"),
+    ("subprocess.run('synthetic', ", "shell=", "False)"), ("yaml.safe_", "load('synthetic')"),
+    ("literal_", "evaluation")])
+def test_ci_pattern_permits_safe_constructs(parts):
+    assert not re.search(unsafe_pattern(), "".join(parts))
 
 
 def credential_patterns():
@@ -46,8 +56,12 @@ def credential_patterns():
 def test_tracked_tree_has_no_secret_patterns():
     result = subprocess.run(["git", "ls-files", "-z"], cwd=ROOT, capture_output=True, check=True)
     names = set(result.stdout.decode().strip("\0").split("\0"))
+    obsolete = {"docs/retry-storm.svg", "docs/mechanism-ladder.svg"}
+    assert not any((ROOT / name).exists() for name in obsolete)
+    names.difference_update(obsolete)
     # Include the authorized additions before staging, too; CI's tracked tree includes them.
-    names.update(("bench/charts.py", "tests/test_finishline.py", "docs/mechanism-ladder.svg"))
+    names.update(("bench/charts.py", "tests/test_finishline.py", "docs/retry-storm-light.svg",
+                  "docs/retry-storm-dark.svg", "docs/protection-ladder-light.svg", "docs/protection-ladder-dark.svg"))
     patterns = credential_patterns()
     assert len(patterns) == 5
     findings = []
