@@ -230,7 +230,7 @@ README = """# AI Provider Outage Test
 
 A controlled experiment on a question every team using AI services runs into: when a service fails, do the usual retry protections actually help — and what do they cost?
 
-## The short version
+## Key findings
 
 Software commonly retries failed calls. This project built a simulated AI service and tested retry protections in four scripted situations. The measurements track successful requests, waiting time, calls reaching the service and repeated work.
 

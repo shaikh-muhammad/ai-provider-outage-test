@@ -415,7 +415,7 @@ def test_saved_boundary_and_every_harmful_step_are_explained(measured, rendered)
 def test_case_study_order_theme_embeds_and_professional_voice(rendered):
     text = rendered["README.md"].decode()
     headings = [line[3:] for line in text.splitlines() if line.startswith("## ")]
-    assert headings == ["The short version", "What was tested", "Results",
+    assert headings == ["Key findings", "What was tested", "Results",
         "Chart 1 — Outage: fewer calls, more failed requests", "Chart 2 — How each protection step performed",
         "Three practical lessons", "How the experiment works", "Data quality", "Limitations",
         "How to reproduce", "Tests", "Tools and credits"]
