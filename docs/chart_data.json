@@ -2,7 +2,7 @@
   "analysis_sources": {
     "bench/analysis.py": "2b291ba85d1696769c5e4aa398f75de255e388fed0a9aaf181dab11ca4e033ed",
     "bench/charts.py": "07dcdf4921653ef098c3da0c50aca54e2f2e16b3b37b93ef9214e9785883d8a2",
-    "bench/report.py": "d5ad358904c4e10c7abeb82bf28900fb21d0a40d2ce9895bc7fedc3a7c8e56ff"
+    "bench/report.py": "2ec1b0fa122574067c55539e91756aba29072399c9d13f78406ae7fe98addb34"
   },
   "capture_runner": {
     "git_commit": "e4e2edde036305b02658a73bd57f93b574dc6cd8",

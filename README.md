@@ -101,7 +101,15 @@ The saved record contains **51 valid official runs**. 1 invalid attempt failed t
 ## How to reproduce
 
 1. **Read:** inspect [saved results](docs/results.md), [chart data](docs/chart_data.json), [registration](bench/registration.lock.json) and [official evidence](results/official/).
-2. **Recompute:** use a full clone, Python 3.14 and pinned dependencies. Run `source scripts/env.sh`, verify `which python` points into the project’s `.venv`, and install binary wheels with `python -m pip install --only-binary=:all: -r requirements-dev.lock`. The report check below reads saved evidence; omit `--check` to regenerate reports and charts.
+2. **Recompute:** from the root of a full clone, create and activate a Python 3.14 environment, install pinned dependencies and check saved evidence. Verify `which python` points into `.venv` after activation; omit `--check` to regenerate reports and charts.
+
+```sh
+python3.14 -m venv .venv
+source scripts/env.sh
+python -m pip install --only-binary=:all: -r requirements-dev.lock
+PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m bench.report --check
+```
+
 3. **New experiments:** require separate approval, fresh output paths and preservation of official files, workloads and failure schedules. See [AGENTS.md](AGENTS.md); this does not authorize a real-provider call.
 
 ## Tests

@@ -428,7 +428,8 @@ def test_case_study_order_theme_embeds_and_professional_voice(rendered):
     opening = "\n".join(text.splitlines()[:30])
     assert all(term in opening for term in ("simulated AI service", "90 → 0", "1.62 → 3.02", "89.3% → 66.5%",
         "three runs", "does not demonstrate real-provider performance", "Measure successful work"))
-    assert "/home/sm" not in text and "I did not shut down the VM" not in text
+    assert not re.search(r"(?:/home/|/Users/|[A-Za-z]:[\\/]Users[\\/])", text, re.I)
+    assert "I did not shut down the VM" not in text
     assert "## Stepwise verdict strength" not in text
     assert "| Situation | Goal measured | C0 baseline retries | C4 full protection | Verdict |" in text
     for path in ("README.md", "docs/results.md"):

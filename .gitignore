@@ -17,3 +17,6 @@ tmp/
 # Local logs from long runs
 logs/
 *.log
+
+# Private G6 plan; public pilot evidence remains visible
+/results/pilot/exploratory-g6-plan-73ca4535be254f1ea59fa047ed5f6c7d.json
