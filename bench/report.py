@@ -327,12 +327,7 @@ PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m bench.report --check
 
 ## Tests
 
-```sh
-source scripts/env.sh
-PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m pytest -q --basetemp="$(dirname "$PWD")/.pytest-tmp-ai-provider-outage-test" tests/
-PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m bench.report --check
-python -m pip check
-```
+After setup above, run `PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 python -m pytest -q --basetemp="$(dirname "$PWD")/.pytest-tmp-ai-provider-outage-test" tests/` and `python -m pip check`.
 
 Verification covers independent recomputation, invalid/tampered evidence, risky calls, secrets, chart freshness and repeatable rendering. Tests launch no official experiments.
 

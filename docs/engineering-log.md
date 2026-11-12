@@ -163,7 +163,7 @@ The following are local Git committer timestamps, normalized to UTC from the rec
 | README publication / PR #9 | 2026-11-07 04:20:21Z | Merge 4ab102d |
 | Existing PR #10 head | 2026-11-07 07:07:35Z | 3723b38; E2/E3 working-tree changes remain uncommitted |
 
-The owner-supplied historical count before Master v2.0 is **51 executions**. E1 is #52, E2 #53 and this E3 #54: **54 including E3, 39–42 above the original 12–15 target**. The November 4 target and November 5 hard cap have been exceeded. **Owner working hours: NOT VERIFIED**; benchmark/CI durations and elapsed calendar time are not substitutes. Original G1/G7 decision records and authenticated registration/recovery approvals remain NOT VERIFIED. The owner states, “I did not shut down the VM”; the shutdown initiator remains unknown.
+The owner-supplied historical count before Master v2.0 is **51 executions**. E1 is #52, E2 #53 and this E3 #54: **54 including E3, 39–42 above the original 12–15 target**. The November 4 target and November 5 hard cap have been exceeded. **Owner working hours: NOT VERIFIED**; benchmark/CI durations and elapsed calendar time are not substitutes. Original G1/G7 decision records and authenticated registration/recovery approvals remain NOT VERIFIED. The owner reported not initiating the VM shutdown; its cause and initiator remain unknown.
 
 The separate Master v2.0 allowance is five execution slots, E1–E5, with E4 conditional on necessary fixes. E3 uses **three of five slots**. This entry does not start E4/E5 or authorize Git writes, experiments or new scope. The earlier Part A budget is not reused as a new authorization.
 
@@ -198,3 +198,17 @@ Validation results are PENDING until measured below. New-head hosted CI remains 
 **E61 validation at stop:** the one complete offline suite with `--durations=20` and required external basetemp reported **2 failed, 587 passed in 590.20 seconds**, exit 1; command wall time 591.49 seconds. Both parametrized `test_no_official_results_or_credentials` cases failed because the pre-existing ignored `logs/execution60/git-baseline-tree.stdout` is a raw Git archive containing admin-header source text. This is a log-policy match, not an external credential finding. No historical log was removed/relocated and no test or scanner was weakened; remediation is outside this execution's file authorization. No second full suite ran.
 
 Generation, report freshness, exact original-CI prohibited-call scan and pip check passed with exit 0. The five credential-value patterns found no matches in all 116 tracked files including all four SVGs. Repeated SVG renders were byte-identical; scientific JSON differed only in the two generator source hashes and all 118 detailed scientific table rows remained exact. All 24 README links/anchors resolved. The 127-line README and four desktop/narrow chart previews were inspected; narrow notes remain dense. Opening/tested prose sentence averages were below 22 words. Raw durations, failures, assertion comparisons, number destinations, metadata verification and exact scope are retained privately. New-head CI remains PENDING because publication is not authorized. Overall local validation is **BLOCKED**, not PASS.
+
+## 2026-11-12 03:25:09 UTC — PR #10 CI and publication chronology (execution #71)
+
+All three runs below were created at `2026-11-08T06:57:48Z` for final PR #10 head `e6159dc27349602d1f82915473151855baee8932`. The original workflow exceeded its frozen five-minute job limit; its printed test total does not make the cancelled workflow a pass.
+
+| Workflow / run | Conclusion | Pytest output | Prohibited-call step |
+| --- | --- | --- | --- |
+| [Original / 42456827155](https://github.com/shaikh-muhammad/ai-provider-outage-test/actions/runs/42456827155) | CANCELLED — five-minute limit | Printed 589 passed in 276.71s; step CANCELLED | SKIPPED |
+| [Supplemental / 42456827127](https://github.com/shaikh-muhammad/ai-provider-outage-test/actions/runs/42456827127) | SUCCESS | 589 passed in 329.63s | SUCCESS |
+| [Report freshness / 42456827112](https://github.com/shaikh-muhammad/ai-provider-outage-test/actions/runs/42456827112) | SUCCESS | G9 freshness PASS | Not applicable |
+
+The [owner-account exception comment](https://github.com/shaikh-muhammad/ai-provider-outage-test/pull/10#issuecomment-6718566264) was posted at `2026-11-08T07:07:57Z`. PR #10 merged normally at `2026-11-08T07:08:39Z` as `e6b16bce915081d734e67f0acdf48d33982d0938`. The exception applies only to `e6159dc27349602d1f82915473151855baee8932`; it does not transfer to later heads or this new PR.
+
+Subsequent documentation commits [2c2dcb66a934b45e708ac34745c2c1564e71c02e](https://github.com/shaikh-muhammad/ai-provider-outage-test/commit/2c2dcb66a934b45e708ac34745c2c1564e71c02e) and [85f34f63b3506860c374302a4b19f130e0fa6052](https://github.com/shaikh-muhammad/ai-provider-outage-test/commit/85f34f63b3506860c374302a4b19f130e0fa6052) went directly to main. They have no hosted main-branch CI runs because all three workflows trigger only on `pull_request`. Local validation results are separate from hosted CI evidence.
